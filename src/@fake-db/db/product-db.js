@@ -190,7 +190,7 @@ mock.onGet('/api/product-app/messages').reply(request => {
 				}); 
 				const data = _.orderBy(temp, ['timestamp'], ['asc']);
 				console.log('-------all messages:', data)
-				resolve([200, data])
+				resolve([200, data]);
 			});
 	});
 });
