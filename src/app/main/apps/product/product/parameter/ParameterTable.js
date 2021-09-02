@@ -1,6 +1,6 @@
 import FuseScrollbars from '@fuse/core/FuseScrollbars';
 import _ from '@lodash';
-import moment from 'moment'
+import moment from 'moment';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -17,6 +17,7 @@ import { getMessages, selectMessages } from '../../store/messagesSlice';
 import { getDescriptions } from '../../store/descriptionsSlice';
 import ParameterTableHead from './ParameterTableHead';
 import { diff } from 'app/utils/Functions';
+import { ROWS_PER_PAGE } from 'app/utils/Globals';
 
 function ProductsTable(props) {
 	const dispatch = useDispatch();
@@ -27,74 +28,90 @@ function ProductsTable(props) {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState(messages);
 	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(10);
+	const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
 	const [order, setOrder] = useState({
 		direction: 'asc',
 		id: null
 	});
-	
+
+	useEffect(() => {
+		setPage(0);
+	}, [searchText, props.counter]);
+
 	useEffect(() => {
 		setLoading(true);
 		dispatch(getDescriptions());
-		dispatch(getMessages(routeParams)).then(() => setLoading(false));		
-	}, [dispatch, routeParams, props.counter]);
+		dispatch(
+			getMessages({
+				deviceId: routeParams.deviceId,
+				limit: ROWS_PER_PAGE,
+				skip: page * ROWS_PER_PAGE,
+				log: 'para'
+			})
+		).then(() => setLoading(false));
+	}, [dispatch, routeParams, searchText, page]);
 
 	useEffect(() => {
-
-		let temp = [];  
+		let temp = [];
 		let groups = [];
-		let params = {};	
-		messages.map((item) => { 
-			!_.isEmpty(item) && Object.keys(item.message).map(msgKey => {			
-				if(msgKey.includes('PARAMETER')) {
-					let group = msgKey;
-					let rootGroup = msgKey;
+		let params = {};
 
-					// check if exist '(' or ')' character in msgKey and remove it
-					const s = msgKey.indexOf('(');
-					const e = msgKey.indexOf(')');					
-					if(s>0 && e>0) {
-						const sub = msgKey.substr(s, e-s+1);
-						group = msgKey.replace(sub, '');
-						rootGroup = group;
+		messages.map(item => {
+			!_.isEmpty(item) &&
+				Object.keys(item.message).map(msgKey => {
+					if (msgKey.includes('PARAMETER')) {
+						let group = msgKey;
+						let rootGroup = msgKey;
+
+						// check if exist '(' or ')' character in msgKey and remove it
+						const s = msgKey.indexOf('(');
+						const e = msgKey.indexOf(')');
+						if (s > 0 && e > 0) {
+							const sub = msgKey.substr(s, e - s + 1);
+							group = msgKey.replace(sub, '');
+							rootGroup = group;
+						}
+
+						// remove the number at the end of parameter
+						let arr = group.split('_');
+						if (arr.length > 3) {
+							arr.splice(2, arr.length - 3);
+							group = arr.join('_');
+							rootGroup = group;
+						}
+
+						arr = rootGroup.split('_');
+						if (arr.length > 2) {
+							arr.splice(2, arr.length - 2);
+							rootGroup = arr.join('_');
+						}
+
+						if (!groups.includes(group)) {
+							groups.push(group);
+							params[group] = { ...item.message[msgKey] };
+							const msg = {
+								...item,
+								group: group,
+								rootGroup: rootGroup,
+								params: { ...item.message[msgKey] }
+							};
+							temp.push(msg);
+						} else {
+							const n = groups.indexOf(group);
+							let tempItem = temp[n];
+							tempItem = { ...tempItem, params: { ...tempItem.params, ...item.message[msgKey] } };
+							temp[n] = tempItem;
+						}
 					}
-					
-					// remove the number at the end of parameter
-					let arr = group.split('_');
-					if(arr.length > 3) {
-						arr.splice(2, arr.length-3);
-						group = arr.join('_');
-						rootGroup = group;
-					}
+					return [];
+				});
+			return [];
+		});
 
-					arr = rootGroup.split('_');
-					if(arr.length > 2) {
-						arr.splice(2, arr.length-2);
-						rootGroup = arr.join('_');
-					}
+		setData(_.orderBy(temp, ['timestamp'], ['desc']));
+	}, [messages]);
 
-					if(!groups.includes(group)) {
-						groups.push(group);
-						params[group] = { ...item.message[msgKey] };
-						const msg = { ...item, group: group, rootGroup: rootGroup, params: { ...item.message[msgKey] } };					
-						temp.push(msg);		
-					} else { 
-						const n = groups.indexOf(group);
-						let tempItem = temp[n]; 
-						tempItem = { ...tempItem, params: { ...tempItem.params, ...item.message[msgKey] } }
-						temp[n] = tempItem;			
-					}										
-				}
-				return [];					
-			});	
-			return [];						
-		}); 
-		
-		temp = _.orderBy(temp, ['timestamp'], ['desc']);
-		setData(temp)	
-	}, [messages, searchText]);
-
-	function handleRequestSort(event, property) { 
+	function handleRequestSort(event, property) {
 		const id = property;
 		let direction = 'desc';
 
@@ -137,18 +154,14 @@ function ProductsTable(props) {
 			<div className="w-full flex flex-col">
 				<FuseScrollbars className="flex-grow overflow-x-auto">
 					<Table stickyHeader className="" aria-labelledby="tableTitle">
-						<ParameterTableHead
-							order={order}
-							onRequestSort={handleRequestSort}
-							rowCount={data.length}
-						/>
+						<ParameterTableHead order={order} onRequestSort={handleRequestSort} rowCount={data.length} />
 
 						<TableBody>
 							{_.orderBy(
 								data,
 								[
 									o => {
-										switch (order.id) {											
+										switch (order.id) {
 											default: {
 												return o[order.id];
 											}
@@ -157,7 +170,7 @@ function ProductsTable(props) {
 								],
 								[order.direction]
 							)
-								.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+								// .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 								.map((n, i) => {
 									return (
 										<TableRow
@@ -166,9 +179,9 @@ function ProductsTable(props) {
 											tabIndex={-1}
 											key={n.id}
 											onClick={event => dispatch(openParameterInfoDialog(n))}
-										>										
+										>
 											<TableCell className="p-4 md:p-16" component="th" scope="row">
-												{i+1}
+												{i + 1}
 											</TableCell>
 
 											<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
@@ -177,7 +190,7 @@ function ProductsTable(props) {
 
 											<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
 												{n.group}
-											</TableCell>										
+											</TableCell>
 										</TableRow>
 									);
 								})}
@@ -201,7 +214,7 @@ function ProductsTable(props) {
 					onChangeRowsPerPage={handleChangeRowsPerPage}
 				/>
 			</div>
-		</div>			
+		</div>
 	);
 }
 

@@ -29,7 +29,7 @@ export const { selectAll: selectMessages, selectById: selectMessageById } = mess
 const messagesSlice = createSlice({
 	name: 'productApp/messages',
 	initialState: messagesAdapter.getInitialState({
-		searchText: ''
+		searchText: 'All'
 	}),
 	reducers: {
 		setMessagesSearchText: {

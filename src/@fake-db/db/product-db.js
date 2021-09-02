@@ -53,7 +53,7 @@ const productDB = {
 			'Braketest: Movement detected',
 			'Braketest: not executed',
 			'OVG relay is not energized',
-			'OVG relay has not dropped out',
+			'OVG relay has not dropped out'
 		],
 		info: [
 			'CanOpenBus Init',
@@ -68,7 +68,7 @@ const productDB = {
 			'In destination',
 			'Assembly mode',
 			'Door stays open',
-			'',			
+			'',
 			'FireFightingMode',
 			'',
 			'',
@@ -86,9 +86,9 @@ const productDB = {
 			'AutomaticEvac.',
 			'EmergencyEvac.',
 			'Wait for guest',
-			'Fill all mode',
+			'Fill all mode'
 		],
-		para: [],
+		para: []
 	}
 };
 
@@ -98,98 +98,104 @@ mock.onGet(`/api/product-app/descriptions`).reply(() => {
 
 mock.onGet(`/api/product-app/products`).reply(() => {
 	return new Promise((resolve, reject) => {
-		axios
-			.get(`${API_URL}/products`, {})
-			.then(response => { 			
-				const data = response.data;
-				resolve([200, data])
-			});
+		axios.get(`${API_URL}/products`, {}).then(response => {
+			const data = response.data;
+			resolve([200, data]);
+		});
 	});
 });
 
 mock.onPost('/api/product-app/remove-products').reply(request => {
-	const { productIds } = JSON.parse(request.data); 
+	const { productIds } = JSON.parse(request.data);
 	return new Promise((resolve, reject) => {
-		axios
-			.post(`${API_URL}/products/deleteByIds`, { productIds })
-			.then(response => { 
-				const data = response.data;
-				resolve([200, data])
-			});
+		axios.post(`${API_URL}/products/deleteByIds`, { productIds }).then(response => {
+			const data = response.data;
+			resolve([200, data]);
+		});
 	});
 });
 
-mock.onGet('/api/product-app/product').reply(request => { 
-	const { productId } = request.params;						
+mock.onGet('/api/product-app/product').reply(request => {
+	const { productId } = request.params;
 	return new Promise((resolve, reject) => {
-		axios
-			.get(`${API_URL}/products/${productId}`, {})
-			.then(response => { 
-				const data = response.data;
-				resolve([200, data])
-			});
+		axios.get(`${API_URL}/products/${productId}`, {}).then(response => {
+			const data = response.data;
+			resolve([200, data]);
+		});
 	});
 });
 
 mock.onPost('/api/product-app/product/save').reply(request => {
-	const data = JSON.parse(request.data); 
+	const data = JSON.parse(request.data);
 	return new Promise((resolve, reject) => {
-		axios.post(`${API_URL}/products/register`, {
-			uid: data.uid,
-			name: data.name,
-			location: data.location,
-			categories: data.categories,
-		})
-		.then(response => {
-			const data = response.data;
-			resolve([200, data])
-		});
+		axios
+			.post(`${API_URL}/products/register`, {
+				uid: data.uid,
+				name: data.name,
+				location: data.location,
+				categories: data.categories
+			})
+			.then(response => {
+				const data = response.data;
+				resolve([200, data]);
+			});
 	});
 });
 
 mock.onPost('/api/product-app/product/update').reply(request => {
-	const data = JSON.parse(request.data); 
+	const data = JSON.parse(request.data);
 	return new Promise((resolve, reject) => {
-		axios.put(`${API_URL}/products/${data.id}`, {
-			uid: data.uid,
-			name: data.name,
-			location: data.location,
-			categories: data.categories,
-		})
-		.then(response => {
-			const data = response.data;
-			resolve([200, data])
-		});
+		axios
+			.put(`${API_URL}/products/${data.id}`, {
+				uid: data.uid,
+				name: data.name,
+				location: data.location,
+				categories: data.categories
+			})
+			.then(response => {
+				const data = response.data;
+				resolve([200, data]);
+			});
 	});
 });
 
 mock.onGet('/api/product-app/messages').reply(request => {
-	const { deviceId } = request.params; 
+	const { deviceId, limit, skip, log } = request.params;
 	return new Promise((resolve, reject) => {
 		axios
-			.get(`${API_URL}/messages/getByDeviceId`, { params: {deviceId: deviceId} })
-			.then(response => { 
-			
-				let temp = [];
-				response.data.map((item) => {
-					const log = item.hasOwnProperty('message') && item.message.hasOwnProperty('log') ? item.message.log : '';
-					const state = item.hasOwnProperty('message') && item.message.hasOwnProperty('state') ? item.message.state : 0;					
-					const errid = item.hasOwnProperty('message') && item.message.hasOwnProperty('errid') ? item.message.errid : 0;	
-					const number = log==='info' ? state : log==='error' ? errid : 0;
-				
+			.get(`${API_URL}/messages/getByPagenation`, { params: { deviceId, limit, skip, log } })
+			.then(response => {
+				let data = [];
+				response.data.map(item => {
+					const log =
+						item.hasOwnProperty('message') && item.message.hasOwnProperty('log') ? item.message.log : '';
+					const state =
+						item.hasOwnProperty('message') && item.message.hasOwnProperty('state') ? item.message.state : 0;
+					const errid =
+						item.hasOwnProperty('message') && item.message.hasOwnProperty('errid') ? item.message.errid : 0;
+					const number = log === 'info' ? state : log === 'error' ? errid : 0;
+
 					let description = '';
 					let errorDescription = '';
-					if(log === 'info' || log === 'error') {
+					if (log === 'info' || log === 'error') {
 						description = productDB.descriptions[log][number];
-						errorDescription = productDB.descriptions['info'][state];	
+						errorDescription = productDB.descriptions['info'][state];
 					}
-												
-					temp.push({ ...item, number: number, log: log, description: description, errorDescription: errorDescription });
 
-					return temp;
-				}); 
-				const data = _.orderBy(temp, ['timestamp'], ['asc']);
-				console.log('-------all messages:', data)
+					data.push({
+						...item,
+						id: item._id,
+						number: number,
+						log: log,
+						description: description,
+						errorDescription: errorDescription
+					});
+
+					return data;
+				});
+
+				
+				console.log('messages:', data);
 				resolve([200, data]);
 			});
 	});
@@ -197,17 +203,15 @@ mock.onGet('/api/product-app/messages').reply(request => {
 
 mock.onGet('/api/product-app/users').reply(() => {
 	return new Promise((resolve, reject) => {
-		axios
-			.get(`${API_URL}/users`, {})
-			.then(response => { 
-				const data = response.data;
-				const users = data.map(item => ({
-					id: item.id,
-					value: item.displayName,
-					label: item.displayName
-				}));
-				resolve([200, users])
-			});
+		axios.get(`${API_URL}/users`, {}).then(response => {
+			const data = response.data;
+			const users = data.map(item => ({
+				id: item.id,
+				value: item.displayName,
+				label: item.displayName
+			}));
+			resolve([200, users]);
+		});
 	});
 });
 

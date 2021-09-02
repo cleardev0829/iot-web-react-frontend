@@ -16,6 +16,7 @@ import { openMessageInfoDialog } from '../../store/dialogSlice';
 import { getMessages, selectMessages } from '../../store/messagesSlice';
 import ProductTableHead from './MessageTableHead';
 import { diff } from 'app/utils/Functions';
+import { ROWS_PER_PAGE } from 'app/utils/Globals';
 
 function ProductsTable(props) {
 	const dispatch = useDispatch();
@@ -26,35 +27,31 @@ function ProductsTable(props) {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState([]);
 	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(10);
+	const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
 	const [order, setOrder] = useState({
 		direction: 'asc',
 		id: null
 	});
 
 	useEffect(() => {
-		setLoading(true);
-		dispatch(getMessages(routeParams)).then(() => setLoading(false));
-	}, [dispatch, routeParams, props.counter]);
+		setPage(0);
+	}, [searchText, props.counter]);
 
 	useEffect(() => {
-		/*
-		filter only log that not para or stats
-		*/
-		let temp = _.filter(
-			messages,
-			item =>
-				!item.log.toLowerCase().includes('para'.toLowerCase()) &&
-				!item.log.toLowerCase().includes('stats'.toLowerCase())
-		);
-		if (searchText.toLowerCase() !== 'all') {
-			temp = _.filter(temp, item => item.log.toLowerCase().includes(searchText.toLowerCase()));
-			setPage(0);
-		}
+		setLoading(true);
+		dispatch(
+			getMessages({
+				deviceId: routeParams.deviceId,
+				limit: ROWS_PER_PAGE,
+				skip: page * ROWS_PER_PAGE,
+				log: searchText.toLowerCase()
+			})
+		).then(() => setLoading(false));
+	}, [dispatch, routeParams, searchText, page]);
 
-		temp = _.orderBy(temp, ['timestamp'], ['desc']);
-		setData(temp);
-	}, [messages, searchText]);
+	useEffect(() => {
+		setData(_.orderBy(messages, ['timestamp'], ['desc']));
+	}, [messages]);
 
 	function handleRequestSort(event, property) {
 		const id = property;
@@ -106,9 +103,6 @@ function ProductsTable(props) {
 							[
 								o => {
 									switch (order.id) {
-										// case 'timestamp': {
-										// 	return o.timestamp;
-										// }
 										default: {
 											return o[order.id];
 										}
@@ -117,7 +111,7 @@ function ProductsTable(props) {
 							],
 							[order.direction]
 						)
-							.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+							// .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 							.map((n, i) => {
 								return (
 									<TableRow
@@ -156,7 +150,7 @@ function ProductsTable(props) {
 			<TablePagination
 				className="flex-shrink-0 border-t-1"
 				component="div"
-				count={data.length}
+				count={data.length > 0 ? parseInt(data[0].count) : 0}
 				rowsPerPage={rowsPerPage}
 				page={page}
 				backIconButtonProps={{

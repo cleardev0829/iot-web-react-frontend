@@ -12,7 +12,6 @@ import { getDuration } from 'app/utils/Functions';
 function Component(props) {
 	const dispatch = useDispatch();
 	const messages = useSelector(selectMessages);
-	const searchText = useSelector(({ productApp }) => productApp.messages.searchText);
 
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState([]);
@@ -20,17 +19,21 @@ function Component(props) {
 	const routeParams = useParams([]);
 
 	useEffect(() => {
-		dispatch(getMessages(routeParams)).then(() => setLoading(false));
+		dispatch(
+			getMessages({
+				deviceId: routeParams.deviceId,
+				limit: 1,
+				skip: 0,
+				log: 'stats'
+			})
+		).then(() => setLoading(false));
 	}, [dispatch, routeParams]);
 
 	useEffect(() => {
-		let temp = _.filter(messages, item => item.log.toLowerCase().includes('stats'.toLowerCase()));
+		console.log('Stats=>', _.orderBy(messages, ['timestamp'], ['desc']))
 
-		temp = _.orderBy(temp, ['timestamp'], ['desc']);
-		console.log('Stats=>', temp)
-
-		setData(temp);
-	}, [messages, searchText]);
+		setData(_.orderBy(messages, ['timestamp'], ['desc']));
+	}, [messages]);
 
 	if (loading) {
 		return <FuseLoading />;
