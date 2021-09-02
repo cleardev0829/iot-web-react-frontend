@@ -289,7 +289,7 @@ function Product() {
 					form && (
 						<>
 							{tabValue === 3 && (
-								<div className="flex w-full flex-row">
+								<div className="flex w-full h-full flex-row">
 									<div className="p-16 sm:p-24 max-w-2xl">
 										<div>
 											<TextField
@@ -370,7 +370,7 @@ function Product() {
 										</div>
 									</div>
 
-									<div className="flex flex-1 flex-col min-w-0">
+									<div className="flex flex-1 flex-col my-8 min-w-0">
 										<motion.div
 											variants={{
 												hidden: { opacity: 0, y: 20 },
