@@ -17,7 +17,7 @@ import { getMessages, selectMessages } from '../../store/messagesSlice';
 import { getDescriptions } from '../../store/descriptionsSlice';
 import ParameterTableHead from './ParameterTableHead';
 import { diff } from 'app/utils/Functions';
-import { ROWS_PER_PAGE } from 'app/utils/Globals';
+import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
 
 function ProductsTable(props) {
 	const dispatch = useDispatch();
@@ -174,7 +174,7 @@ function ProductsTable(props) {
 								.map((n, i) => {
 									return (
 										<TableRow
-											className="h-64 cursor-pointer"
+											className={`h-${MD_ROW_HEIGHT} cursor-pointer`}
 											hover
 											tabIndex={-1}
 											key={n.id}

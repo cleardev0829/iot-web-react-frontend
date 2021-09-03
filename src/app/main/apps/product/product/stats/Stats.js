@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter, useParams } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
-import { getMessages, selectMessages } from '../store/messagesSlice';
+import { getMessages, selectMessages } from '../../store/messagesSlice';
 import { getDuration } from 'app/utils/Functions';
 
 function Component(props) {

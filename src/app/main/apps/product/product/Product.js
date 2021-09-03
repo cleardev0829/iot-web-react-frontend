@@ -21,7 +21,7 @@ import { saveProduct, updateProduct } from '../store/productSlice';
 import { setMessagesSearchText } from '../store/messagesSlice';
 import MessageTable from './message/MessageTable';
 import ParameterTable from './parameter/ParameterTable';
-import Stats from './Stats';
+import Stats from './stats/Stats';
 import FileList from './file-manager/FileList';
 import DetailSidebarHeader from './file-manager/DetailSidebarHeader';
 import DetailSidebarContent from './file-manager/DetailSidebarContent';

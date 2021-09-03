@@ -16,7 +16,7 @@ import { openMessageInfoDialog } from '../../store/dialogSlice';
 import { getMessages, selectMessages } from '../../store/messagesSlice';
 import ProductTableHead from './MessageTableHead';
 import { diff } from 'app/utils/Functions';
-import { ROWS_PER_PAGE } from 'app/utils/Globals';
+import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
 
 function ProductsTable(props) {
 	const dispatch = useDispatch();
@@ -34,7 +34,7 @@ function ProductsTable(props) {
 	});
 
 	useEffect(() => {
-		setPage(0);
+		setPage(0); 
 	}, [searchText, props.counter]);
 
 	useEffect(() => {
@@ -115,7 +115,7 @@ function ProductsTable(props) {
 							.map((n, i) => {
 								return (
 									<TableRow
-										className={`h-64 cursor-pointer ${n.log === 'error' && 'bg-red-50'}`}
+										className={`h-${MD_ROW_HEIGHT} cursor-pointer ${n.log === 'error' && 'bg-red-50'}`}
 										hover
 										tabIndex={-1}
 										key={n.id}
