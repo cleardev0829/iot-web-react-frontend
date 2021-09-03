@@ -2,7 +2,7 @@
 import FuseAnimate from '@fuse/core/FuseAnimate';
 import FuseChipSelect from '@fuse/core/FuseChipSelect';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { useForm, useDeepCompareEffect } from '@fuse/hooks';
+import { useForm } from '@fuse/hooks';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
@@ -11,8 +11,8 @@ import _ from '@lodash';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { resetProduct, newProduct, getProduct } from '../../store/productSlice';
-import { getUsers, selectUsers } from '../../store/usersSlice';
+import { resetProduct } from '../../store/productSlice';
+import { selectUsers } from '../../store/usersSlice';
 import ReactPlaceAutoComplete from './ReactPlaceAutoComplete';
 import Map from './Map';
 
@@ -27,29 +27,9 @@ function Component(props) {
 	const [noProduct, setNoProduct] = useState(false);
 	const { form, handleChange, setForm } = useForm(null);	
 
-	useDeepCompareEffect(() => {
-		function updateProductState() {
-			const { productId } = routeParams;
-
-			dispatch(getUsers());
-
-			if (productId === 'new') {
-				dispatch(newProduct());
-			} else {
-				dispatch(getProduct(routeParams)).then(action => {
-					if (!action.payload) {
-						setNoProduct(true);
-					}
-				});
-			}
-		}
-
-		updateProductState();
-	}, [dispatch, routeParams]);
-
 	useEffect(() => {
 		if ((product && !form) || (product && form && product.id !== form.id)) {
-			setForm(product);
+			setForm(product); 
 			props.setForm(product);
 		}
 	}, [form, product, setForm]);

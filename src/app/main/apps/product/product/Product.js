@@ -1,6 +1,7 @@
 /* eslint-disable */
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import FuseAnimate from '@fuse/core/FuseAnimate';
+import { useDeepCompareEffect } from '@fuse/hooks';
 import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -17,8 +18,9 @@ import withReducer from 'app/store/withReducer';
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams, useHistory } from 'react-router-dom';
-import { saveProduct, updateProduct } from '../store/productSlice';
+import { getProduct, newProduct, saveProduct, updateProduct } from '../store/productSlice';
 import { setMessagesSearchText } from '../store/messagesSlice';
+import { getUsers } from '../store/usersSlice';
 import MessageTable from './message/MessageTable';
 import ParameterTable from './parameter/ParameterTable';
 import Stats from './stats/Stats';
@@ -52,8 +54,29 @@ function Product() {
 	const [count, setCount] = useState(0);
 	const [form, setForm] = useState({});
 
+	useDeepCompareEffect(() => { 
+		function updateProductState() {
+			const { productId } = routeParams;
+
+			dispatch(getUsers());
+
+			if (productId === 'new') {
+				dispatch(newProduct());
+			} else {
+				dispatch(getProduct(routeParams)).then(action => {
+					if (!action.payload) {
+						setNoProduct(true);
+					}
+				});
+			}
+		}
+
+		updateProductState();
+	}, [dispatch, routeParams]);
+
 	useEffect(() => {
 		const { productId } = routeParams;
+		
 		if (productId === 'new') {
 			setTabValue(3);
 		}
@@ -102,7 +125,7 @@ function Product() {
 								<div className="flex flex-col min-w-0 mx-8 sm:mc-16">
 									<FuseAnimate animation="transition.slideLeftIn" delay={300}>
 										<Typography className="text-16 sm:text-20 truncate">
-											{form && form.name ? `${form.name} - ${form.uid}` : 'New Lift'}
+											{product && product.name ? `${product.name} - ${product.uid} - ${product.location.address}` : 'New Lift'}
 										</Typography>
 									</FuseAnimate>
 									<FuseAnimate animation="transition.slideLeftIn" delay={300}>
@@ -203,7 +226,7 @@ function Product() {
 						{tabValue === 2 && <ParameterTable />}
 						{tabValue === 3 && (
 							<BaseInfo
-								setForm={form => {
+								setForm={form => {									
 									setForm(form);
 								}}
 							/>
