@@ -51,7 +51,7 @@ function ProductsHeader(props) {
 					</FuseAnimate>
 				</ThemeProvider>
 			</div>
-			{authUser.role==='admin' &&
+			{authUser.role === 'admin' && (
 				<FuseAnimate animation="transition.slideRightIn" delay={300}>
 					<Button
 						component={Link}
@@ -65,8 +65,7 @@ function ProductsHeader(props) {
 						<span className="flex">New</span>
 					</Button>
 				</FuseAnimate>
-			}
-			
+			)}
 		</div>
 	);
 }

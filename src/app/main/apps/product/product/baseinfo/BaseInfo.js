@@ -11,7 +11,6 @@ import _ from '@lodash';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { resetProduct } from '../../store/productSlice';
 import { selectUsers } from '../../store/usersSlice';
 import ReactPlaceAutoComplete from './ReactPlaceAutoComplete';
 import Map from './Map';
@@ -25,18 +24,17 @@ function Component(props) {
 	const users = useSelector(selectUsers);
 
 	const [noProduct, setNoProduct] = useState(false);
-	const { form, handleChange, setForm } = useForm(null);	
+	const { form, handleChange, setForm } = useForm(null);
 
 	useEffect(() => {
 		if ((product && !form) || (product && form && product.id !== form.id)) {
-			setForm(product); 
+			setForm(product);
 			props.setForm(product);
 		}
 	}, [form, product, setForm]);
 
 	useEffect(() => {
 		return () => {
-			dispatch(resetProduct());
 			setNoProduct(false);
 		};
 	}, [dispatch]);
@@ -63,7 +61,7 @@ function Component(props) {
 		props.setForm({
 			...form,
 			[event.target.name]: event.target.value
-		})
+		});
 	};
 
 	const _onGoogleApiLoaded = data => {
@@ -80,7 +78,7 @@ function Component(props) {
 		console.log('Location', location);
 		setForm({ ...form, location });
 		props.setForm({ ...form, location });
-	};	
+	};
 
 	if (noProduct) {
 		return (
@@ -103,6 +101,7 @@ function Component(props) {
 		);
 	}
 
+	console.log('=========================', product);
 	if ((!product || (product && routeParams.productId !== product.id)) && routeParams.productId !== 'new') {
 		return <FuseLoading />;
 	}

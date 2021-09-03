@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { openParameterInfoDialog } from '../../store/dialogSlice';
@@ -19,7 +19,7 @@ import ParameterTableHead from './ParameterTableHead';
 import { diff } from 'app/utils/Functions';
 import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
 
-function ProductsTable(props) {
+function Component(props) {
 	const dispatch = useDispatch();
 	const routeParams = useParams([]);
 	const messages = useSelector(selectMessages);
@@ -40,6 +40,7 @@ function ProductsTable(props) {
 
 	useEffect(() => {
 		setLoading(true);
+
 		dispatch(getDescriptions());
 		dispatch(
 			getMessages({
@@ -49,7 +50,7 @@ function ProductsTable(props) {
 				log: 'para'
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, searchText, page]);
+	}, [dispatch, routeParams, searchText, page, props.counter]);
 
 	useEffect(() => {
 		let temp = [];
@@ -218,4 +219,4 @@ function ProductsTable(props) {
 	);
 }
 
-export default withRouter(ProductsTable);
+export default Component;

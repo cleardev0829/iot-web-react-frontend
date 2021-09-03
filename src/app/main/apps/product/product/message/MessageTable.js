@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { openMessageInfoDialog } from '../../store/dialogSlice';
@@ -18,7 +18,7 @@ import ProductTableHead from './MessageTableHead';
 import { diff } from 'app/utils/Functions';
 import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
 
-function ProductsTable(props) {
+function Component(props) {
 	const dispatch = useDispatch();
 	const routeParams = useParams([]);
 	const messages = useSelector(selectMessages);
@@ -34,11 +34,12 @@ function ProductsTable(props) {
 	});
 
 	useEffect(() => {
-		setPage(0); 
+		setPage(0);
 	}, [searchText, props.counter]);
 
 	useEffect(() => {
 		setLoading(true);
+
 		dispatch(
 			getMessages({
 				deviceId: routeParams.deviceId,
@@ -47,7 +48,7 @@ function ProductsTable(props) {
 				log: searchText.toLowerCase()
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, searchText, page]);
+	}, [dispatch, routeParams, searchText, page, props.counter]);
 
 	useEffect(() => {
 		setData(_.orderBy(messages, ['timestamp'], ['desc']));
@@ -115,7 +116,9 @@ function ProductsTable(props) {
 							.map((n, i) => {
 								return (
 									<TableRow
-										className={`h-${MD_ROW_HEIGHT} cursor-pointer ${n.log === 'error' && 'bg-red-50'}`}
+										className={`h-${MD_ROW_HEIGHT} cursor-pointer ${
+											n.log === 'error' && 'bg-red-50'
+										}`}
 										hover
 										tabIndex={-1}
 										key={n.id}
@@ -166,4 +169,4 @@ function ProductsTable(props) {
 	);
 }
 
-export default withRouter(ProductsTable);
+export default Component;

@@ -18,7 +18,7 @@ import withReducer from 'app/store/withReducer';
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams, useHistory } from 'react-router-dom';
-import { getProduct, newProduct, saveProduct, updateProduct } from '../store/productSlice';
+import { getProduct, newProduct, resetProduct, saveProduct, updateProduct } from '../store/productSlice';
 import { setMessagesSearchText } from '../store/messagesSlice';
 import { getUsers } from '../store/usersSlice';
 import MessageTable from './message/MessageTable';
@@ -54,7 +54,7 @@ function Product() {
 	const [count, setCount] = useState(0);
 	const [form, setForm] = useState({});
 
-	useDeepCompareEffect(() => { 
+	useDeepCompareEffect(() => {
 		function updateProductState() {
 			const { productId } = routeParams;
 
@@ -75,8 +75,14 @@ function Product() {
 	}, [dispatch, routeParams]);
 
 	useEffect(() => {
+		return () => {
+			dispatch(resetProduct());
+		};
+	}, [dispatch]);
+
+	useEffect(() => {
 		const { productId } = routeParams;
-		
+
 		if (productId === 'new') {
 			setTabValue(3);
 		}
@@ -125,7 +131,9 @@ function Product() {
 								<div className="flex flex-col min-w-0 mx-8 sm:mc-16">
 									<FuseAnimate animation="transition.slideLeftIn" delay={300}>
 										<Typography className="text-16 sm:text-20 truncate">
-											{product && product.name ? `${product.name} - ${product.uid} - ${product.location.address}` : 'New Lift'}
+											{product && product.name
+												? `${product.name} - ${product.uid} - ${product.location.address}`
+												: 'New Lift'}
 										</Typography>
 									</FuseAnimate>
 									<FuseAnimate animation="transition.slideLeftIn" delay={300}>
@@ -210,23 +218,23 @@ function Product() {
 						scrollButtons="auto"
 						classes={{ root: 'w-full h-64' }}
 					>
-						<Tab className="h-64 normal-case" label="Stats" />
-						<Tab className="h-64 normal-case" label="Message" />
-						<Tab className="h-64 normal-case" label="Parameter" />
+						<Tab className="h-64 normal-case" label="Stats" disabled={!routeParams.deviceId} />
+						<Tab className="h-64 normal-case" label="Message" disabled={!routeParams.deviceId} />
+						<Tab className="h-64 normal-case" label="Parameter" disabled={!routeParams.deviceId} />
 						<Tab className="h-64 normal-case" label="Basic Info" />
-						<Tab className="h-64 normal-case" label="Files" />
-						<Tab className="h-64 normal-case" label="Echtzeit" />
-						<Tab className="h-64 normal-case" label="Monteure" />
+						<Tab className="h-64 normal-case" label="Files" disabled={!routeParams.deviceId} />
+						<Tab className="h-64 normal-case" label="Echtzeit" disabled={!routeParams.deviceId} />
+						<Tab className="h-64 normal-case" label="Monteure" disabled={!routeParams.deviceId} />
 					</Tabs>
 				}
 				content={
 					<>
-						{tabValue === 0 && <Stats />}
+						{tabValue === 0 && <Stats counter={count} />}
 						{tabValue === 1 && <MessageTable counter={count} />}
-						{tabValue === 2 && <ParameterTable />}
+						{tabValue === 2 && <ParameterTable counter={count} />}
 						{tabValue === 3 && (
 							<BaseInfo
-								setForm={form => {									
+								setForm={form => {
 									setForm(form);
 								}}
 							/>

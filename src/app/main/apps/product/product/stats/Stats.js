@@ -3,7 +3,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { withRouter, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { getMessages, selectMessages } from '../../store/messagesSlice';
@@ -19,6 +19,8 @@ function Component(props) {
 	const routeParams = useParams([]);
 
 	useEffect(() => {
+		setLoading(true);
+
 		dispatch(
 			getMessages({
 				deviceId: routeParams.deviceId,
@@ -27,10 +29,10 @@ function Component(props) {
 				log: 'stats'
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams]);
+	}, [dispatch, routeParams, props.counter]);
 
 	useEffect(() => {
-		console.log('Stats=>', _.orderBy(messages, ['timestamp'], ['desc']))
+		console.log('Stats=>', _.orderBy(messages, ['timestamp'], ['desc']));
 
 		setData(_.orderBy(messages, ['timestamp'], ['desc']));
 	}, [messages]);
@@ -100,4 +102,4 @@ function Component(props) {
 	);
 }
 
-export default withRouter(Component);
+export default Component;
