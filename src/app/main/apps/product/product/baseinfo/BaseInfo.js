@@ -101,7 +101,6 @@ function Component(props) {
 		);
 	}
 
-	console.log('=========================', product);
 	if ((!product || (product && routeParams.productId !== product.id)) && routeParams.productId !== 'new') {
 		return <FuseLoading />;
 	}

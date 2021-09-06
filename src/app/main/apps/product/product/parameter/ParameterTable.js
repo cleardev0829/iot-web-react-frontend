@@ -45,8 +45,8 @@ function Component(props) {
 		dispatch(
 			getMessages({
 				deviceId: routeParams.deviceId,
-				limit: ROWS_PER_PAGE,
-				skip: page * ROWS_PER_PAGE,
+				limit: rowsPerPage,
+				skip: page * rowsPerPage,
 				log: 'para'
 			})
 		).then(() => setLoading(false));
@@ -202,7 +202,7 @@ function Component(props) {
 				<TablePagination
 					className="flex-shrink-0 border-t-1"
 					component="div"
-					count={data.length}
+					count={data.length > 0 ? parseInt(data[0].count) : 0}
 					rowsPerPage={rowsPerPage}
 					page={page}
 					backIconButtonProps={{
