@@ -42,6 +42,14 @@ const navigationConfig = [
 				type: 'item',
 				icon: 'account_box',
 				url: '/apps/servicers'
+			},
+			{
+				id: 'errors',
+				title: 'Errors',
+				translate: 'Errors',
+				type: 'item',
+				icon: 'error_outline',
+				url: '/apps/errors'
 			},					
 		]
 	}

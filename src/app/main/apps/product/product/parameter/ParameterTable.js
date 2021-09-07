@@ -50,7 +50,7 @@ function Component(props) {
 				log: 'para'
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, searchText, page, props.counter]);
+	}, [dispatch, routeParams, searchText, page, rowsPerPage, props.counter]);
 
 	useEffect(() => {
 		let temp = [];

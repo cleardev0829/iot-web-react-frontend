@@ -9,20 +9,21 @@ import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
-import { openMessageInfoDialog } from '../../store/dialogSlice';
-import { getMessages, selectMessages } from '../../store/messagesSlice';
-import ProductTableHead from './MessageTableHead';
+import { openMessageInfoDialog } from '../store/dialogSlice';
+import { getMessages, selectMessages } from '../store/messagesSlice';
+import { selectProducts } from '../store/productsSlice';
+import MessageTableHead from './MessageTableHead';
 import { diff } from 'app/utils/Functions';
 import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
 
 function Component(props) {
 	const dispatch = useDispatch();
-	const routeParams = useParams([]);
 	const messages = useSelector(selectMessages);
-	const searchText = useSelector(({ productApp }) => productApp.messages.searchText);
+	const products = useSelector(selectProducts);
+	const searchText = useSelector(({ errorsApp }) => errorsApp.messages.searchText);
+	const user = useSelector(({ auth }) => auth.user);
 
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState([]);
@@ -42,17 +43,22 @@ function Component(props) {
 
 		dispatch(
 			getMessages({
-				deviceId: routeParams.deviceId,
-				limit: rowsPerPage,
-				skip: page * rowsPerPage,
+				limit: 1000,
+				skip: 0,
 				log: searchText.toLowerCase()
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, searchText, page, rowsPerPage, props.counter]);
+	}, [dispatch, searchText, page, rowsPerPage, props.counter]);
 
 	useEffect(() => {
-		setData(_.orderBy(messages, ['timestamp'], ['desc']));
-	}, [messages]);
+		let _messages = [];
+		const productsIds = _.map(products, 'uid');
+
+		if (user.role === 'admin') _messages = [...messages];
+		else _messages = _.filter(messages, item => productsIds.includes(item.message.ID.toString()));
+
+		setData(_.orderBy(_messages, ['timestamp'], ['desc']));
+	}, [products, messages, user]);
 
 	function handleRequestSort(event, property) {
 		const id = property;
@@ -96,7 +102,7 @@ function Component(props) {
 		<div className="w-full flex flex-col">
 			<FuseScrollbars className="flex-grow overflow-x-auto">
 				<Table stickyHeader className="" aria-labelledby="tableTitle">
-					<ProductTableHead order={order} onRequestSort={handleRequestSort} rowCount={data.length} />
+					<MessageTableHead order={order} onRequestSort={handleRequestSort} rowCount={data.length} />
 
 					<TableBody>
 						{_.orderBy(
@@ -112,7 +118,7 @@ function Component(props) {
 							],
 							[order.direction]
 						)
-							// .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+							.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 							.map((n, i) => {
 								return (
 									<TableRow
@@ -126,6 +132,10 @@ function Component(props) {
 									>
 										<TableCell className="p-4 md:p-16" component="th" scope="row">
 											{i + 1}
+										</TableCell>
+
+										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+											{n.id.ID}
 										</TableCell>
 
 										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
@@ -153,7 +163,7 @@ function Component(props) {
 			<TablePagination
 				className="flex-shrink-0 border-t-1"
 				component="div"
-				count={data.length > 0 ? parseInt(data[0].count) : 0}
+				count={data.length}
 				rowsPerPage={rowsPerPage}
 				page={page}
 				backIconButtonProps={{

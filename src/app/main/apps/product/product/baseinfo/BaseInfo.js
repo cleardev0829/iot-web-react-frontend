@@ -125,7 +125,6 @@ function Component(props) {
 							inputProps={{
 								readOnly: role !== 'admin'
 							}}
-							disabled={role !== 'admin'}
 						/>
 
 						<TextField

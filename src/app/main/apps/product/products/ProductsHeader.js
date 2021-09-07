@@ -59,9 +59,7 @@ function ProductsHeader(props) {
 						className="whitespace-nowrap normal-case"
 						variant="contained"
 						color="secondary"
-					>
-						{/* <span className="hidden sm:flex">Add New Lifts</span>
-						<span className="flex sm:hidden">New</span> */}
+					>						
 						<span className="flex">New</span>
 					</Button>
 				</FuseAnimate>
