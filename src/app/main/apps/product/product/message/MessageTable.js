@@ -7,6 +7,9 @@ import TableCell from '@material-ui/core/TableCell';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import { green } from '@material-ui/core/colors';
+import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -14,7 +17,10 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { openMessageInfoDialog } from '../../store/dialogSlice';
 import { getMessages, selectMessages } from '../../store/messagesSlice';
+import { openNewNoteDialog } from '../../store/noteSlice';
+import { getServicers } from '../../store/servicersSlice';
 import ProductTableHead from './MessageTableHead';
+import MessageDialog from './MessageDialog';
 import { diff } from 'app/utils/Functions';
 import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
 
@@ -40,6 +46,7 @@ function Component(props) {
 	useEffect(() => {
 		setLoading(true);
 
+		dispatch(getServicers());
 		dispatch(
 			getMessages({
 				deviceId: routeParams.deviceId,
@@ -122,27 +129,85 @@ function Component(props) {
 										hover
 										tabIndex={-1}
 										key={n.id}
-										onClick={event => dispatch(openMessageInfoDialog(n))}
 									>
-										<TableCell className="p-4 md:p-16" component="th" scope="row">
+										<TableCell
+											onClick={event => dispatch(openMessageInfoDialog(n))}
+											className="p-4 md:p-16"
+											component="th"
+											scope="row"
+										>
 											{i + 1}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell
+											onClick={event => dispatch(openMessageInfoDialog(n))}
+											className="p-4 md:p-16 truncate"
+											component="th"
+											scope="row"
+										>
 											{diff(moment(), n.timestamp)}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell
+											onClick={event => dispatch(openMessageInfoDialog(n))}
+											className="p-4 md:p-16 truncate"
+											component="th"
+											scope="row"
+										>
 											{n.log}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell
+											onClick={event => dispatch(openMessageInfoDialog(n))}
+											className="p-4 md:p-16 truncate"
+											component="th"
+											scope="row"
+										>
 											{n.number}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell
+											onClick={event => dispatch(openMessageInfoDialog(n))}
+											className="p-4 md:p-16 truncate"
+											component="th"
+											scope="row"
+										>
 											{n.description}
 										</TableCell>
+{/* 
+										<TableCell
+											className="w-52 px-4 md:px-16 truncate"
+											component="th"
+											scope="row"
+											align="right"
+											padding="none"
+										>
+											{n.log === 'error' && (
+												<IconButton
+													onClick={ev => {
+														ev.preventDefault();
+														ev.stopPropagation();
+														dispatch(openNewNoteDialog({ messageId: n.id }));
+													}}
+												>
+													{n.number > 1 ? (
+														<Icon style={{ color: green[500] }}>comment</Icon>
+													) : (
+														<Icon>comment</Icon>
+													)}
+												</IconButton>
+											)}
+										</TableCell>
+
+										<TableCell
+											className="w-52 px-4 md:px-16 truncate"
+											component="th"
+											scope="row"
+											align="right"
+											padding="none"
+										>
+											{n.log === 'error' && <MessageDialog />}
+										</TableCell> */}
 									</TableRow>
 								);
 							})}

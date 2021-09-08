@@ -5,7 +5,7 @@ import uploadFileToBlob, {
 	getBlobsInContainer,
 	deleteBlobInContainer,
 	downloadBlobFromContainer
-} from '../product/file-manager/azure-storage-blob';
+} from '../../../../utils/azure-storage-blob';
 
 export const getFiles = createAsyncThunk('productApp/files/getFiles', async params => {
 	const response = await axios.get('/api/file-manager-app/files/getByLiftId', {

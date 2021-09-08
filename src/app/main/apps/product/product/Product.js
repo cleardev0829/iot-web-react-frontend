@@ -28,6 +28,8 @@ import FileList from './file-manager/FileList';
 import DetailSidebarHeader from './file-manager/DetailSidebarHeader';
 import DetailSidebarContent from './file-manager/DetailSidebarContent';
 import MessageInfoDialog from './message/MessageInfoDialog';
+import CommentDialog from './message/NoteDialog';
+import MessageDialog from './message/MessageDialog';
 import ParameterInfoDialog from './parameter/ParameterInfoDialog';
 import reducer from '../store';
 import BaseInfo from './baseinfo/BaseInfo';
@@ -252,6 +254,7 @@ function Product() {
 			/>
 			<MessageInfoDialog />
 			<ParameterInfoDialog />
+			<CommentDialog />
 		</>
 	);
 }

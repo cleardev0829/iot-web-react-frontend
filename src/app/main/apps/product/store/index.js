@@ -9,6 +9,8 @@ import folders from './foldersSlice';
 import labels from './labelsSlice';
 import descriptions from './descriptionsSlice';
 import files from './filesSlice';
+import notes from './noteSlice';
+import servicers from './servicersSlice';
 
 const reducer = combineReducers({
 	products,	
@@ -20,7 +22,9 @@ const reducer = combineReducers({
 	labels,
 	filters,
 	descriptions,
-	files
+	files,
+	notes,
+	servicers,
 });
 
 export default reducer;

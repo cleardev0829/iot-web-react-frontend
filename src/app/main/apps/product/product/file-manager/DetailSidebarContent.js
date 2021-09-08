@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { getFiles, selectFileById, uploadFile } from '../../store/filesSlice';
-import { isStorageConfigured } from './azure-storage-blob';
+import { isStorageConfigured } from '../../../../../utils/azure-storage-blob';
 
 const storageConfigured = isStorageConfigured();
 

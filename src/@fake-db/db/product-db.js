@@ -206,7 +206,7 @@ mock.onGet('/api/product-app/messages').reply(request => {
 				});
 
 				
-				console.log('messages:', data);
+				console.log('MESSAGES:', data);
 				resolve([200, data]);
 			});
 	});
@@ -237,7 +237,7 @@ mock.onGet('/api/product-app/last-messages').reply(request => {
 
 					data.push({
 						...item,
-						id: item._id,
+						id: item.lastId,
 						number: number,
 						log: log,
 						description: description,
@@ -248,7 +248,7 @@ mock.onGet('/api/product-app/last-messages').reply(request => {
 				});
 
 				
-				console.log('last-messages:', data);
+				console.log('LAST MESSAGES:', data);
 				resolve([200, data]);
 			});
 	});

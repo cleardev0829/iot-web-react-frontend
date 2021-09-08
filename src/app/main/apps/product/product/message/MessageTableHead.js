@@ -41,6 +41,20 @@ const rows = [
 		label: 'Description',
 		sort: true
 	},
+	// {
+	// 	id: 'note',
+	// 	align: 'right',
+	// 	disablePadding: false,
+	// 	label: 'Note',
+	// 	sort: true
+	// },	
+	// {
+	// 	id: 'message',
+	// 	align: 'right',
+	// 	disablePadding: false,
+	// 	label: 'Message',
+	// 	sort: true
+	// },	
 ];
 
 function ProductTableHead(props) {

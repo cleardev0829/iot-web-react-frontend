@@ -8,18 +8,6 @@ export const getUsers = createAsyncThunk('productApp/users/getUsers', async () =
 	return data;
 });
 
-export const removeUsers = createAsyncThunk(
-	'productApp/users/removeUsers',
-	async (userIds, { dispatch, getState }) => {
-		const response = await axios.post('/api/product-app/remove-users', { userIds });
-		const data = await response.data;
-
-		dispatch(getUsers());
-
-		return data;
-	}
-);
-
 const usersAdapter = createEntityAdapter({});
 
 export const { selectAll: selectUsers, selectById: selectMessageById } = usersAdapter.getSelectors(
@@ -28,22 +16,11 @@ export const { selectAll: selectUsers, selectById: selectMessageById } = usersAd
 
 const usersSlice = createSlice({
 	name: 'productApp/users',
-	initialState: usersAdapter.getInitialState({
-		searchText: ''
-	}),
-	reducers: {
-		setUsersSearchText: {
-			reducer: (state, action) => {
-				state.searchText = action.payload;
-			},
-			prepare: event => ({ payload: event.target.value || '' })
-		}
-	},
+	initialState: usersAdapter.getInitialState({}),
+	reducers: {},
 	extraReducers: {
 		[getUsers.fulfilled]: usersAdapter.setAll
 	}
 });
-
-export const { setUsersSearchText } = usersSlice.actions;
 
 export default usersSlice.reducer;
