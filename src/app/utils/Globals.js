@@ -2,6 +2,7 @@ export const ROW_HEIGHT = 64;
 export const MD_ROW_HEIGHT = 52;
 export const MIN_ROW_HEIGHT = 44;
 export const ROWS_PER_PAGE = 10;
+export const ROWS_PER_PAGE_50 = 50;
 
 export const PARAMETERS = {
 	'PARAMETER_STR' : { 

@@ -12,6 +12,7 @@ import { getDuration } from 'app/utils/Functions';
 function Component(props) {
 	const dispatch = useDispatch();
 	const messages = useSelector(selectMessages);
+	const counter = useSelector(({ productApp }) => productApp.refresh.counter);
 
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState([]);
@@ -29,7 +30,7 @@ function Component(props) {
 				log: 'stats'
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, props.counter]);
+	}, [dispatch, routeParams, counter]);
 
 	useEffect(() => {
 		console.log('Stats=>', _.orderBy(messages, ['timestamp'], ['desc']));

@@ -24,6 +24,7 @@ function Component(props) {
 	const routeParams = useParams([]);
 	const messages = useSelector(selectMessages);
 	const searchText = useSelector(({ productApp }) => productApp.messages.searchText);
+	const counter = useSelector(({ productApp }) => productApp.refresh.counter);
 
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState(messages);
@@ -36,7 +37,7 @@ function Component(props) {
 
 	useEffect(() => {
 		setPage(0);
-	}, [searchText, props.counter]);
+	}, [searchText, counter]);
 
 	useEffect(() => {
 		setLoading(true);
@@ -50,7 +51,7 @@ function Component(props) {
 				log: 'para'
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, searchText, page, rowsPerPage, props.counter]);
+	}, [dispatch, routeParams, searchText, page, rowsPerPage, counter]);
 
 	useEffect(() => {
 		let temp = [];

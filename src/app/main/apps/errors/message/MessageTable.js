@@ -16,7 +16,7 @@ import { getMessages, selectMessages } from '../store/messagesSlice';
 import { selectProducts } from '../store/productsSlice';
 import MessageTableHead from './MessageTableHead';
 import { diff } from 'app/utils/Functions';
-import { MD_ROW_HEIGHT, ROWS_PER_PAGE } from 'app/utils/Globals';
+import { ROW_HEIGHT, ROWS_PER_PAGE_50 } from 'app/utils/Globals';
 
 function Component(props) {
 	const dispatch = useDispatch();
@@ -28,7 +28,7 @@ function Component(props) {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState([]);
 	const [page, setPage] = useState(0);
-	const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
+	const [rowsPerPage, setRowsPerPage] = useState(searchText === 'last' ? 1000 : ROWS_PER_PAGE_50);
 	const [order, setOrder] = useState({
 		direction: 'asc',
 		id: null
@@ -43,9 +43,10 @@ function Component(props) {
 
 		dispatch(
 			getMessages({
-				limit: 1000,
+				limit: searchText === 'last' ? 1000 : 50,
 				skip: 0,
-				log: searchText.toLowerCase()
+				log: 'error',
+				searchText
 			})
 		).then(() => setLoading(false));
 	}, [dispatch, searchText, page, rowsPerPage, props.counter]);
@@ -122,7 +123,7 @@ function Component(props) {
 							.map((n, i) => {
 								return (
 									<TableRow
-										className={`h-${MD_ROW_HEIGHT} cursor-pointer ${
+										className={`h-${ROW_HEIGHT} cursor-pointer ${
 											n.log === 'error' && 'bg-red-50'
 										}`}
 										hover
@@ -135,7 +136,7 @@ function Component(props) {
 										</TableCell>
 
 										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
-											{n._id.ID}
+											{n.message.ID}
 										</TableCell>
 
 										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">

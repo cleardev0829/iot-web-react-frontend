@@ -2,7 +2,9 @@ import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/too
 import axios from 'axios';
 
 export const getMessages = createAsyncThunk('errorsApp/messages/getMessages', async params => {
-	const response = await axios.get('/api/product-app/last-messages', { params });
+	let response = {};
+	if (params.searchText === 'last') response = await axios.get('/api/product-app/last-messages', { params });
+	else if (params.searchText === 'all') response = await axios.get('/api/product-app/messages', { params });
 	const data = await response.data;
 
 	return data;
@@ -17,7 +19,7 @@ export const { selectAll: selectMessages, selectById: selectMessageById } = mess
 const messagesSlice = createSlice({
 	name: 'errorsApp/messages',
 	initialState: messagesAdapter.getInitialState({
-		searchText: 'error'
+		searchText: 'last'
 	}),
 	reducers: {
 		setMessagesSearchText: {
