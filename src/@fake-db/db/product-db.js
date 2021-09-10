@@ -171,8 +171,6 @@ mock.onPost('/api/product-app/product/update').reply(request => {
 });
 
 mock.onGet('/api/product-app/messages').reply(request => {
-	const { deviceId, limit, skip, log } = request.params;
-
 	return new Promise((resolve, reject) => {
 		axios.get(`${API_URL}/messages/getByPagenation`, { params: { ...request.params } }).then(response => {
 			let data = [];

@@ -23,6 +23,7 @@ export const addNote = createAsyncThunk('productApp/notes/addNote', async (notes
 			new Promise(async (resolve, reject) => {
 				await deleteBlobInContainer({ name: Path.basename(url) })
 					.then(() => {
+						console.log('-------------delete', url)
 						resolve();
 					})
 					.catch(() => {
@@ -39,6 +40,7 @@ export const addNote = createAsyncThunk('productApp/notes/addNote', async (notes
 			new Promise(async (resolve, reject) => {
 				await uploadFileToBlob(file)
 					.then(url => {
+						console.log('-------------upload', url)
 						urls.push(url);
 						resolve();
 					})
@@ -48,11 +50,14 @@ export const addNote = createAsyncThunk('productApp/notes/addNote', async (notes
 			})
 		);
 	});
-	await Promise.all(promise);
+	await Promise.all(promise).then(() => {
+		console.log('-------------all')
+	});
 
+	console.log('-------------update')
 	const response = await axios.post('api/product-app/message/update', { ...notes, urls: urls });
 	const data = await response.data;
-
+	console.log('-------------refresh')
 	await dispatch(refresh());
 
 	return data;
@@ -127,7 +132,7 @@ const notesSlice = createSlice({
 				props: {
 					open: false
 				},
-				data: action.payload
+				data: null
 			};
 		}
 	},

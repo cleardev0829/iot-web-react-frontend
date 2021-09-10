@@ -1,5 +1,4 @@
 import { useForm } from '@fuse/hooks';
-import FuseUtils from '@fuse/utils';
 import _ from '@lodash';
 import Path from 'path';
 import AppBar from '@material-ui/core/AppBar';
@@ -8,6 +7,8 @@ import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from '@material-ui/core/FormControl';
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
@@ -18,6 +19,7 @@ import Typography from '@material-ui/core/Typography';
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeNote, addNote, closeNewNoteDialog, closeEditNoteDialog } from '../../store/noteSlice';
+import { openDialog, closeDialog } from 'app/store/fuse/dialogSlice';
 import FormUploadFile from './FormUploadFile';
 
 const defaultFormState = {
@@ -40,10 +42,10 @@ function NoteDialog(props) {
 		/**
 		 * Dialog type: 'edit'
 		 */
-		 let _fileObjs = [];
-		 let _files = [];
-		if (noteDialog.type === 'edit' && noteDialog.data) {			
-			noteDialog.data.urls.map(url => {
+		let _fileObjs = [];
+		let _files = [];
+		if (noteDialog.type === 'edit' && noteDialog.data) {
+			noteDialog.data.urls.map(url =>
 				fetch(url).then(response => {
 					response.blob().then(blob => {
 						const file = new File([blob], Path.basename(url), {
@@ -60,10 +62,15 @@ function NoteDialog(props) {
 							setForm({ ...noteDialog.data, fileObjs: _fileObjs, files: _files });
 						};
 					});
-				});
-			});
+				})
+			);
 
-			setForm({ ...defaultFormState, ...noteDialog.data });
+			setForm({
+				...defaultFormState,
+				...noteDialog.data,
+				fileObjs: _fileObjs,
+				files: _files
+			});
 		}
 
 		/**
@@ -72,14 +79,12 @@ function NoteDialog(props) {
 		if (noteDialog.type === 'new') {
 			setForm({
 				...defaultFormState,
-				...noteDialog.data
+				...noteDialog.data,
+				fileObjs: _fileObjs,
+				files: _files
 			});
 		}
 	}, [noteDialog.data, noteDialog.type, setForm]);
-
-	function closeNoteDialog() {
-		return noteDialog.type === 'edit' ? dispatch(closeEditNoteDialog()) : dispatch(closeNewNoteDialog());
-	}
 
 	useEffect(() => {
 		/**
@@ -252,16 +257,46 @@ function NoteDialog(props) {
 						className="min-w-auto"
 						onClick={() => {
 							dispatch(
-								removeNote({
-									isNotes: false,
-									messageId: form.messageId,
-									title: '',
-									notes: '',
-									urls: []
+								openDialog({
+									children: (
+										<React.Fragment>
+											<DialogTitle id="alert-dialog-title">Are you really delete?</DialogTitle>
+											<DialogContent>
+												<DialogContentText id="alert-dialog-description">
+													{`You will be lost thie notes`}.
+												</DialogContentText>
+											</DialogContent>
+											<DialogActions>
+												<Button onClick={() => dispatch(closeDialog())} color="primary">
+													Disagree
+												</Button>
+												<Button
+													onClick={() =>
+														dispatch(
+															removeNote({
+																isNotes: false,
+																messageId: form.messageId,
+																title: '',
+																notes: '',
+																urls: [],
+																files: [],
+																fileObj: []
+															})
+														).then(() => {
+															closeNoteDialog();
+															dispatch(closeDialog());
+														})
+													}
+													color="primary"
+													autoFocus
+												>
+													Agree
+												</Button>
+											</DialogActions>
+										</React.Fragment>
+									)
 								})
-							).then(() => {
-								closeNoteDialog();
-							});
+							);
 						}}
 					>
 						<Icon>delete</Icon>
