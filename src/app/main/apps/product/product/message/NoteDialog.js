@@ -1,6 +1,7 @@
 import { useForm } from '@fuse/hooks';
 import FuseUtils from '@fuse/utils';
 import _ from '@lodash';
+import Path from 'path';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
@@ -14,9 +15,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import TextField from '@material-ui/core/TextField';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeNote, addNote, closeNewNoteDialog, closeEditNoteDialog, updateNote } from '../../store/noteSlice';
+import { removeNote, addNote, closeNewNoteDialog, closeEditNoteDialog } from '../../store/noteSlice';
 import FormUploadFile from './FormUploadFile';
 
 const defaultFormState = {
@@ -35,13 +36,34 @@ function NoteDialog(props) {
 
 	const { form, handleChange, setForm } = useForm({ ...defaultFormState });
 
-	const initDialog = useCallback(() => {
-		console.log(noteDialog.data);
+	const initDialog = useCallback(async () => {
 		/**
 		 * Dialog type: 'edit'
 		 */
-		if (noteDialog.type === 'edit' && noteDialog.data) {
-			setForm({ ...noteDialog.data });
+		 let _fileObjs = [];
+		 let _files = [];
+		if (noteDialog.type === 'edit' && noteDialog.data) {			
+			noteDialog.data.urls.map(url => {
+				fetch(url).then(response => {
+					response.blob().then(blob => {
+						const file = new File([blob], Path.basename(url), {
+							type: blob.type,
+							lastModified: new Date()
+						});
+						const reader = new FileReader();
+						reader.readAsDataURL(blob);
+
+						reader.onload = () => {
+							_fileObjs.push(reader.result);
+							_files.push(file);
+
+							setForm({ ...noteDialog.data, fileObjs: _fileObjs, files: _files });
+						};
+					});
+				});
+			});
+
+			setForm({ ...defaultFormState, ...noteDialog.data });
 		}
 
 		/**
@@ -50,8 +72,7 @@ function NoteDialog(props) {
 		if (noteDialog.type === 'new') {
 			setForm({
 				...defaultFormState,
-				...noteDialog.data,
-				id: FuseUtils.generateGUID()
+				...noteDialog.data
 			});
 		}
 	}, [noteDialog.data, noteDialog.type, setForm]);
@@ -75,6 +96,7 @@ function NoteDialog(props) {
 
 	function handleUploadChange(e) {
 		const file = e.target.files[0];
+
 		if (!file) {
 			return;
 		}
@@ -100,8 +122,11 @@ function NoteDialog(props) {
 	}
 
 	function handleRemoveFile() {
-		setForm(_.setIn(form, `fileObjs`, form.fileObjs.splice(form.fileObjs.length - 1, 1)));
-		setForm(_.setIn(form, `files`, form.files.splice(-1, 1)));
+		setForm({
+			...form,
+			fileObjs: form.fileObjs.slice(0, form.fileObjs.length - 1),
+			files: form.files.slice(0, form.files.length - 1)
+		});
 	}
 
 	function canBeSubmitted() {
@@ -152,7 +177,7 @@ function NoteDialog(props) {
 						/>
 					</FormControl>
 
-					{noteDialog.type === 'new' && form.fileObjs && form.fileObjs.length > 0 && (
+					{form.fileObjs && form.fileObjs.length > 0 && (
 						<FormControl className="mt-8 mb-16" required fullWidth>
 							<div className="relative">
 								<div className="flex flex-row items-center">
@@ -180,41 +205,13 @@ function NoteDialog(props) {
 						</FormControl>
 					)}
 
-					{noteDialog.type === 'edit' && form.urls && form.urls.length > 0 && (
-						<FormControl className="mt-8 mb-16" required fullWidth>
-							<div className="relative">
-								<div className="flex flex-row items-center">
-									{form.urls.map((url, index) => (
-										<img
-											key={index}
-											src={url}
-											className="w-52 h-52 mr-8 block rounded"
-											alt="note"
-										/>
-									))}
-								</div>
-
-								<Fab
-									className="absolute right-0 bottom-0 m-8"
-									variant="extended"
-									size="small"
-									color="secondary"
-									aria-label="Delete File"
-									onClick={handleRemoveFile}
-								>
-									<Icon fontSize="small">delete</Icon>
-								</Fab>
-							</div>
-						</FormControl>
-					)}
-
-					{/* <FormControl className="mt-8 mb-16" required fullWidth>
+					<FormControl className="mt-8 mb-16" required fullWidth>
 						<Tooltip title="Add file" placement="bottom">
 							<div>
 								<FormUploadFile onChange={handleUploadChange} />
 							</div>
 						</Tooltip>
-					</FormControl> */}
+					</FormControl>
 				</div>
 			</DialogContent>
 
@@ -242,7 +239,7 @@ function NoteDialog(props) {
 							variant="contained"
 							color="primary"
 							onClick={() => {
-								dispatch(updateNote({ ...form, isNote: true })).then(() => {
+								dispatch(addNote({ ...form, isNote: true })).then(() => {
 									closeNoteDialog();
 								});
 							}}

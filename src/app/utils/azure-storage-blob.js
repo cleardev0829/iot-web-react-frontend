@@ -57,7 +57,7 @@ export const getBlobsInContainer = async () => {
 };
 // </snippet_getBlobsInContainer>
 
-export const deleteBlobInContainer = async file => {
+export const deleteBlobInContainer = async file => {console.log('-----------------------', file.name)
 	const blobService = new BlobServiceClient(`https://${storageAccountName}.blob.core.windows.net/?${sasToken}`);
 	const containerClient: ContainerClient = blobService.getContainerClient(containerName);
 	const blockBlobClient = containerClient.getBlockBlobClient(file.name);
@@ -66,7 +66,7 @@ export const deleteBlobInContainer = async file => {
 	return blobDeleteResponse;
 };
 
-export const downloadBlobFromContainer = async file => {
+export const downloadBlobFromContainer = async file => { 
 	const blobService = new BlobServiceClient(`https://${storageAccountName}.blob.core.windows.net/?${sasToken}`);
 	const containerClient: ContainerClient = blobService.getContainerClient(containerName);
 	const blockBlobClient = containerClient.getBlockBlobClient(file.name);

@@ -1,12 +1,7 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
-import { makeid } from 'app/utils/Functions';
 import axios from 'axios';
-import { useReducer } from 'react';
-import uploadFileToBlob, {
-	getBlobsInContainer,
-	deleteBlobInContainer,
-	downloadBlobFromContainer
-} from '../../../../utils/azure-storage-blob';
+import Path from 'path';
+import uploadFileToBlob, { deleteBlobInContainer } from '../../../../utils/azure-storage-blob';
 import { refresh } from './refreshSlice';
 
 export const getNotes = createAsyncThunk('productApp/notes/getNotes', async params => {
@@ -19,31 +14,47 @@ export const getNotes = createAsyncThunk('productApp/notes/getNotes', async para
 });
 
 export const addNote = createAsyncThunk('productApp/notes/addNote', async (notes, { dispatch, getState }) => {
-	// let urls = [];
-	// let promise = [];
+	console.log(notes)
+	let urls = [];
+	let promise = [];
 
-	// notes.files.map(async file => {
-	// 	promise.push(
-	// 		new Promise(async (resolve, reject) => {
-	// 			await uploadFileToBlob(file)
-	// 				.then(url => {
-	// 					urls.push(url);
-	// 					resolve();
-	// 				})
-	// 				.catch(err => {
-	// 					resolve();
-	// 				});
-	// 		})
-	// 	);
-	// });
+	notes.urls.map(async url => {
+		promise.push(
+			new Promise(async (resolve, reject) => {
+				await deleteBlobInContainer({ name: Path.basename(url) })
+					.then(() => {
+						resolve();
+					})
+					.catch(() => {
+						resolve();
+					});
+			})
+		);
+	});
+	await Promise.all(promise);
 
-	// await Promise.all(promise);
+	promise = [];
+	notes.files.map(async file => {
+		promise.push(
+			new Promise(async (resolve, reject) => {
+				await uploadFileToBlob(file)
+					.then(url => {
+						urls.push(url);
+						resolve();
+					})
+					.catch(() => {
+						resolve();
+					});
+			})
+		);
+	});
+	await Promise.all(promise);
 
-	const response = await axios.post('api/product-app/message/update', { ...notes });
-	const data = response.data;
+	const response = await axios.post('api/product-app/message/update', { ...notes, urls: urls });
+	const data = await response.data;
 
-	dispatch(refresh());
-	
+	await dispatch(refresh());
+
 	return data;
 });
 
