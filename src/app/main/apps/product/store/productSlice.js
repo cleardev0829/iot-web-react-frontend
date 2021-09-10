@@ -27,11 +27,11 @@ export const updateProduct = createAsyncThunk('productApp/product/updateProduct'
 const productAdapter = createEntityAdapter({});
 
 export const { selectAll: selectProducts, selectById: selectProductById } = productAdapter.getSelectors(
-	state => state.productApp.product
+	state => state.productApp.counter
 );
 
 const productSlice = createSlice({
-	name: 'productApp/product',
+	name: 'productApp/refresh',
 	initialState: null,
 	reducers: {
 		resetProduct: () => null,

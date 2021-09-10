@@ -86,10 +86,6 @@ function DetailSidebarContent(props) {
 		</div>
 	);
 
-	// if (!selectedItem) {
-	// 	return null;
-	// }
-
 	return (
 		<FuseAnimate animation="transition.slideUpIn" delay={200}>
 			<div className="file-details p-16 sm:p-24">
@@ -102,7 +98,7 @@ function DetailSidebarContent(props) {
 						</Typography>
 					)}
 					<hr />
-					{/* {storageConfigured && blobList.length > 0 && DisplayImagesFromContainer()} */}
+				
 					{!storageConfigured && <div className="mt-12">Storage is not configured.</div>}
 				</div>
 
@@ -120,11 +116,7 @@ function DetailSidebarContent(props) {
 
 							<tr className="size">
 								<th>Size</th>
-								<td>
-									{selectedItem.size === ''
-										? '-'
-										: `${selectedItem.size / 1000} KiB`}
-								</td>
+								<td>{selectedItem.size === '' ? '-' : `${selectedItem.size / 1000} KiB`}</td>
 							</tr>
 
 							{/* <tr className="modified">

@@ -19,6 +19,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import { getProduct, newProduct, resetProduct, saveProduct, updateProduct } from '../store/productSlice';
+import { refresh } from '../store/refreshSlice';
 import { setMessagesSearchText } from '../store/messagesSlice';
 import { getUsers } from '../store/usersSlice';
 import MessageTable from './message/MessageTable';
@@ -29,7 +30,6 @@ import DetailSidebarHeader from './file-manager/DetailSidebarHeader';
 import DetailSidebarContent from './file-manager/DetailSidebarContent';
 import MessageInfoDialog from './message/MessageInfoDialog';
 import CommentDialog from './message/NoteDialog';
-import MessageDialog from './message/MessageDialog';
 import ParameterInfoDialog from './parameter/ParameterInfoDialog';
 import reducer from '../store';
 import BaseInfo from './baseinfo/BaseInfo';
@@ -50,6 +50,7 @@ function Product() {
 	const role = useSelector(({ auth }) => auth.user.role);
 	const product = useSelector(({ productApp }) => productApp.product);
 	const searchText = useSelector(({ productApp }) => productApp.messages.searchText);
+	const counter = useSelector(({ productApp }) => productApp.refresh.counter); 
 	const theme = useTheme();
 
 	const [tabValue, setTabValue] = useState(1);
@@ -95,7 +96,7 @@ function Product() {
 	}
 
 	const handleRefresh = () => {
-		setCount(count + 1);
+		dispatch(refresh());
 	};
 
 	function canBeSubmitted() {
@@ -232,7 +233,7 @@ function Product() {
 				content={
 					<>
 						{tabValue === 0 && <Stats counter={count} />}
-						{tabValue === 1 && <MessageTable counter={count} />}
+						{tabValue === 1 && <MessageTable />}
 						{tabValue === 2 && <ParameterTable counter={count} />}
 						{tabValue === 3 && (
 							<BaseInfo

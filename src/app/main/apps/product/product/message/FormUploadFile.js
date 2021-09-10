@@ -2,7 +2,7 @@ import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
 import React from 'react';
 
-function FormUploadImage(props) {
+function FormUploadFile(props) {
 	return (
 		<>
 			<label htmlFor="button-file">
@@ -15,4 +15,4 @@ function FormUploadImage(props) {
 	);
 }
 
-export default FormUploadImage;
+export default FormUploadFile;

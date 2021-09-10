@@ -1,5 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import product from './productSlice';
+import refresh from './refreshSlice';
 import products from './productsSlice';
 import dialog from './dialogSlice';
 import messages from './messagesSlice';
@@ -15,6 +16,7 @@ import servicers from './servicersSlice';
 const reducer = combineReducers({
 	products,	
 	product,
+	refresh,
 	dialog,
 	messages,
 	users,

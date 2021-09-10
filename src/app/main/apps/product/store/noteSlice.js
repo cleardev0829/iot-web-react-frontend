@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import { makeid } from 'app/utils/Functions';
 import axios from 'axios';
+import { useReducer } from 'react';
 import uploadFileToBlob, {
 	getBlobsInContainer,
 	deleteBlobInContainer,
 	downloadBlobFromContainer
 } from '../../../../utils/azure-storage-blob';
+import { refresh } from './refreshSlice';
 
 export const getNotes = createAsyncThunk('productApp/notes/getNotes', async params => {
 	const response = await axios.get('/api/notes-app/notes/getByMessageId', {
@@ -16,38 +18,49 @@ export const getNotes = createAsyncThunk('productApp/notes/getNotes', async para
 	return data;
 });
 
-export const addNote = createAsyncThunk('productApp/notes/addNote', async (form) => {
-	// let url = "";
+export const addNote = createAsyncThunk('productApp/notes/addNote', async (notes, { dispatch, getState }) => {
+	// let urls = [];
+	// let promise = [];
 
-	// if(form.file) {
-	// 	url = 
-	// 	await uploadFileToBlob({...form.file, name: })
-	// }
+	// notes.files.map(async file => {
+	// 	promise.push(
+	// 		new Promise(async (resolve, reject) => {
+	// 			await uploadFileToBlob(file)
+	// 				.then(url => {
+	// 					urls.push(url);
+	// 					resolve();
+	// 				})
+	// 				.catch(err => {
+	// 					resolve();
+	// 				});
+	// 		})
+	// 	);
+	// });
 
-	const response = await axios.post('/api/notes-app/notes/save', {
-		uid: makeid(30),
-		url: '',
-		...form
-	});
+	// await Promise.all(promise);
 
-	const data = await response.data;
+	const response = await axios.post('api/product-app/message/update', { ...notes });
+	const data = response.data;
+
+	dispatch(refresh());
+	
 	return data;
 });
 
-export const updateNote = createAsyncThunk('productApp/notes/updateNote', async (note, { dispatch, getState }) => {
-	const response = await axios.post('/api/notes-app/update', note);
+export const updateNote = createAsyncThunk('productApp/notes/updateNote', async (notes, { dispatch, getState }) => {
+	const response = await axios.post('api/product-app/message/update', { ...notes });
 	const data = await response.data;
 
-	dispatch(getNotes());
+	dispatch(refresh());
 
 	return data;
 });
 
-export const removeNote = createAsyncThunk('productApp/notes/removeNote', async (noteId, { dispatch, getState }) => {
-	const response = await axios.post('/api/notes-app/remove', noteId);
+export const removeNote = createAsyncThunk('productApp/notes/removeNote', async (notes, { dispatch, getState }) => {
+	const response = await axios.post('api/product-app/message/update', { ...notes });
 	const data = await response.data;
 
-	dispatch(getNotes());
+	dispatch(refresh());
 
 	return data;
 });
@@ -61,10 +74,6 @@ export const { selectAll: selectNotes, selectById: selectNotesById } = notesAdap
 const notesSlice = createSlice({
 	name: 'productApp/notes',
 	initialState: notesAdapter.getInitialState({
-		searchText: '',
-		orderBy: '',
-		orderDescending: false,
-		routeParams: {},
 		noteDialog: {
 			type: 'new',
 			props: {
@@ -74,18 +83,6 @@ const notesSlice = createSlice({
 		}
 	}),
 	reducers: {
-		setNotesSearchText: {
-			reducer: (state, action) => {
-				state.searchText = action.payload;
-			},
-			prepare: event => ({ payload: event.target.value || '' })
-		},
-		toggleOrderDescending: (state, action) => {
-			state.orderDescending = !state.orderDescending;
-		},
-		changeOrder: (state, action) => {
-			state.orderBy = action.payload;
-		},
 		openNewNoteDialog: (state, action) => {
 			state.noteDialog = {
 				type: 'new',
@@ -130,14 +127,6 @@ const notesSlice = createSlice({
 	}
 });
 
-export const {
-	setNotesSearchText,
-	toggleOrderDescending,
-	changeOrder,
-	openNewNoteDialog,
-	closeNewNoteDialog,
-	openEditNoteDialog,
-	closeEditNoteDialog
-} = notesSlice.actions;
+export const { openNewNoteDialog, closeNewNoteDialog, openEditNoteDialog, closeEditNoteDialog } = notesSlice.actions;
 
 export default notesSlice.reducer;

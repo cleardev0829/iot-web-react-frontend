@@ -56,7 +56,7 @@ function DetailSidebarHeader(props) {
 
 	const onFileDownload = () => {
 		dispatch(downloadFile(selectedItem)).then(() => {
-			dispatch(showMessage({ message: 'File Download succefully', variant: 'success' }));
+			dispatch(showMessage({ message: 'File Download successfully', variant: 'success' }));
 		});
 	};
 

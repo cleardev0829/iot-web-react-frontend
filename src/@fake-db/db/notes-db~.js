@@ -27,8 +27,7 @@ mock.onPost('/api/notes-app/notes/save').reply(request => {
 				messageId: data.messageId,
 				title: data.title,
 				note: data.note,
-				url: data.url,
-				file: data.image,
+				urls: data.urls,
 			})
 			.then(response => {
 				const data = response.data;

@@ -17,7 +17,7 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { openMessageInfoDialog } from '../../store/dialogSlice';
 import { getMessages, selectMessages } from '../../store/messagesSlice';
-import { openNewNoteDialog } from '../../store/noteSlice';
+import { openNewNoteDialog, openEditNoteDialog } from '../../store/noteSlice';
 import { getServicers } from '../../store/servicersSlice';
 import ProductTableHead from './MessageTableHead';
 import MessageDialog from './MessageDialog';
@@ -29,6 +29,7 @@ function Component(props) {
 	const routeParams = useParams([]);
 	const messages = useSelector(selectMessages);
 	const searchText = useSelector(({ productApp }) => productApp.messages.searchText);
+	const counter = useSelector(({ productApp }) => productApp.refresh.counter);
 
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState([]);
@@ -41,7 +42,7 @@ function Component(props) {
 
 	useEffect(() => {
 		setPage(0);
-	}, [searchText, props.counter]);
+	}, [searchText, counter]);
 
 	useEffect(() => {
 		setLoading(true);
@@ -55,7 +56,7 @@ function Component(props) {
 				log: searchText.toLowerCase()
 			})
 		).then(() => setLoading(false));
-	}, [dispatch, routeParams, searchText, page, rowsPerPage, props.counter]);
+	}, [dispatch, routeParams, searchText, page, rowsPerPage, counter]);
 
 	useEffect(() => {
 		setData(_.orderBy(messages, ['timestamp'], ['desc']));
@@ -174,7 +175,7 @@ function Component(props) {
 										>
 											{n.description}
 										</TableCell>
-{/* 
+
 										<TableCell
 											className="w-52 px-4 md:px-16 truncate"
 											component="th"
@@ -187,10 +188,16 @@ function Component(props) {
 													onClick={ev => {
 														ev.preventDefault();
 														ev.stopPropagation();
-														dispatch(openNewNoteDialog({ messageId: n.id }));
+														n.isNotes
+															? dispatch(
+																	openEditNoteDialog({ messageId: n.id, ...n.notes })
+															  )
+															: dispatch(
+																	openNewNoteDialog({ messageId: n.id, ...n.notes })
+															  );
 													}}
 												>
-													{n.number > 1 ? (
+													{n.isNotes ? (
 														<Icon style={{ color: green[500] }}>comment</Icon>
 													) : (
 														<Icon>comment</Icon>
@@ -207,7 +214,7 @@ function Component(props) {
 											padding="none"
 										>
 											{n.log === 'error' && <MessageDialog />}
-										</TableCell> */}
+										</TableCell>
 									</TableRow>
 								);
 							})}

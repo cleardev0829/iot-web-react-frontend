@@ -22,7 +22,7 @@ export const saveServicer = createAsyncThunk(
 		await axios
 			.post('/api/servicers-app/servicer/save', form)
 			.then(() => {
-				dispatch(showMessage({ message: 'Service man data Saved succefully', variant: 'success' }));
+				dispatch(showMessage({ message: 'Service man data Saved successfully', variant: 'success' }));
 				dispatch(getServicers());
 			})
 			.catch(err => {

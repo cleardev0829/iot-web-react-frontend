@@ -254,6 +254,25 @@ mock.onGet('/api/product-app/last-messages').reply(request => {
 	});
 });
 
+mock.onPost('/api/product-app/message/update').reply(request => {
+	const data = JSON.parse(request.data);
+	return new Promise((resolve, reject) => {
+		axios
+			.put(`${API_URL}/messages/${data.messageId}`, {
+				isNotes: data.isNotes,
+				notes: {
+					title: data.title,
+					notes: data.notes,
+					urls: data.urls
+				}
+			})
+			.then(response => {
+				const data = response.data;
+				resolve([200, data]);
+			});
+	});
+});
+
 mock.onGet('/api/product-app/users').reply(() => {
 	return new Promise((resolve, reject) => {
 		axios.get(`${API_URL}/users`, {}).then(response => {
