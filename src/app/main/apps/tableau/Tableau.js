@@ -189,7 +189,7 @@ function Resource(props) {
             <Tab className="h-64 normal-case" label="displays" />
             <Tab className="h-64 normal-case" label="engravings" />
             <Tab className="h-64 normal-case" label="others" />
-            {/* <Tab className="h-64 normal-case" label="templates" /> */}
+            <Tab className="h-64 normal-case" label="templates" />
           </Tabs>
         }
         content={
