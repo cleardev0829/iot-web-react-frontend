@@ -106,11 +106,11 @@ function ParameterInfoDialog(props) {
 									tabIndex={-1}
 									key={`row-${key}`}
 								>
-									<TableCell className="p-4 md:p-16" component="th" scope="row">
+									<TableCell key={`col-1-${key}`} className="p-4 md:p-16" component="th" scope="row">
 										{key}
 									</TableCell>
 
-									<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+									<TableCell key={`col-2-${key}`} className="p-4 md:p-16 truncate" component="th" scope="row">
 										{form[key]}
 									</TableCell>
 								</TableRow>

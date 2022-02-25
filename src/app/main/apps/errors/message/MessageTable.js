@@ -7,8 +7,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import Icon from '@material-ui/core/Icon';
+import IconButton from '@material-ui/core/IconButton';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FuseAnimate from '@fuse/core/FuseAnimate/FuseAnimate';
 import { openMessageInfoDialog } from '../store/dialogSlice';
@@ -20,6 +23,7 @@ import { ROW_HEIGHT, ROWS_PER_PAGE_50 } from 'app/utils/Globals';
 
 function Component(props) {
 	const dispatch = useDispatch();
+	const history = useHistory();
 	const messages = useSelector(selectMessages);
 	const products = useSelector(selectProducts);
 	const searchText = useSelector(({ errorsApp }) => errorsApp.messages.searchText);
@@ -53,10 +57,10 @@ function Component(props) {
 
 	useEffect(() => {
 		let _messages = [];
-		const productsIds = _.map(products, 'uid');
+		const productUIDs = _.map(products, 'uid');
 
 		if (user.role === 'admin') _messages = [...messages];
-		else _messages = _.filter(messages, item => productsIds.includes(item.message.ID.toString()));
+		else _messages = _.filter(messages, item => productUIDs.includes(item.message.ID.toString()));
 
 		setData(_.orderBy(_messages, ['timestamp'], ['desc']));
 	}, [products, messages, user]);
@@ -123,36 +127,48 @@ function Component(props) {
 							.map((n, i) => {
 								return (
 									<TableRow
-										className={`h-${ROW_HEIGHT} cursor-pointer ${
-											n.log === 'error' && 'bg-red-50'
-										}`}
+										className={`h-${ROW_HEIGHT} cursor-pointer`}
 										hover
 										tabIndex={-1}
 										key={n.id}
-										onClick={event => dispatch(openMessageInfoDialog(n))}
+										
 									>
-										<TableCell className="p-4 md:p-16" component="th" scope="row">
+										<TableCell className="p-4 md:p-16" component="th" scope="row" onClick={() => dispatch(openMessageInfoDialog(n))}>
 											{i + 1}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row" onClick={() => dispatch(openMessageInfoDialog(n))}>
 											{n.message.ID}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row" onClick={() => dispatch(openMessageInfoDialog(n))}>
 											{diff(moment(), n.timestamp)}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row" onClick={() => dispatch(openMessageInfoDialog(n))}>
 											{n.log}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row" onClick={() => dispatch(openMessageInfoDialog(n))}>
 											{n.number}
 										</TableCell>
 
-										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row">
+										<TableCell className="p-4 md:p-16 truncate" component="th" scope="row" onClick={() => dispatch(openMessageInfoDialog(n))}>
 											{n.description}
+										</TableCell>
+
+										<TableCell
+											className="w-52 px-4 md:px-16 truncate"
+											component="th"
+											scope="row"
+											align="center"
+											padding="none"
+										>
+											<IconButton
+													onClick={() => history.push(`/apps/product/products/${n.lift}/${n.message.ID}`)}
+												>													
+														<Icon>navigate_next</Icon>																									
+												</IconButton>
 										</TableCell>
 									</TableRow>
 								);

@@ -85,7 +85,7 @@ function MessageInfoDialog(props) {
 										key={`row-${key}-up`}
 									>
 										<TableCell
-											key={`col-${n}-key-up`}
+											key={`col-1-${key}-up`}
 											className="p-4 md:p-16"
 											component="th"
 											scope="row"
@@ -95,7 +95,7 @@ function MessageInfoDialog(props) {
 										</TableCell>
 
 										<TableCell
-											key={`col-${n}-key-up`}
+											key={`col-2-${key}-up`}
 											className="p-4 md:p-16 truncate"
 											component="th"
 											scope="row"
@@ -129,10 +129,10 @@ function MessageInfoDialog(props) {
 										className={`h-${MIN_ROW_HEIGHT} cursor-pointer`}
 										hover
 										tabIndex={-1}
-										key={`row-${n}-under`}
+										key={`row-${key}-under`}
 									>
 										<TableCell
-											key={`col-${n}-key-under`}
+											key={`col-1-${key}-under`}
 											className="p-4 md:p-16"
 											component="th"
 											scope="row"
@@ -142,7 +142,7 @@ function MessageInfoDialog(props) {
 										</TableCell>
 
 										<TableCell
-											key={`col-${n}-value-under`}
+											key={`col-2-${key}-under`}
 											className="p-4 md:p-16 truncate"
 											component="th"
 											scope="row"

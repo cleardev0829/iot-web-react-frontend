@@ -48,6 +48,13 @@ const rows = [
 		label: 'Description',
 		sort: true
 	},	
+	{
+		id: 'lift',
+		align: 'left',
+		disablePadding: false,
+		label: '',
+		sort: true
+	},
 ];
 
 function MessageTableHead(props) {

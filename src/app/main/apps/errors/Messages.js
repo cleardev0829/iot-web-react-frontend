@@ -44,14 +44,11 @@ function Error() {
 		<>
 			<FusePageSimple
 				classes={{
-					root: 'bg-red',
-					header: 'h-96 min-h-96 sm:h-160 sm:min-h-160',
-					sidebarHeader: 'h-96 min-h-96 sm:h-160 sm:min-h-160',
-					rightSidebar: 'w-320'
+					content: 'flex'
 				}}
 				header={
-					<div className="flex flex-1 w-full items-center justify-between p-8 sm:p-12">
-						<div className="flex items-center max-w-full">
+					<div className="flex flex-wrap flex-1 items-center justify-between p-12 md:p-24">
+						<div className="flex flex-row w-full sm:w-auto">
 							<FuseAnimate animation="transition.expandIn" delay={300}>
 								<Icon className="text-32">error_outline</Icon>
 							</FuseAnimate>
@@ -62,7 +59,7 @@ function Error() {
 							</FuseAnimate>
 						</div>
 
-						<div className="flex flex-1 items-center justify-center px-12">
+						<div className="flex flex-1 items-center justify-center w-full sm:w-auto sm:px-12">
 								<FuseAnimate animation="transition.slideDownIn" delay={300}>
 									<FormControl className="flex w-full sm:w-320 mx-16" variant="outlined">
 										<InputLabel htmlFor="category-label-placeholder"> Log </InputLabel>
@@ -87,14 +84,17 @@ function Error() {
 								</FuseAnimate>
 							</div>
 
-						<FuseAnimate animation="transition.slideRightIn" delay={300}>
+						<FuseAnimate animation="transition.slideRightIn" delay={300}>					
 							<Button
-								className="whitespace-nowrap normal-case"
-								variant="contained"
-								color="secondary"
+								className="normal-case ml-8 sm:ml-0"
+								variant="outlined"
+								target="_blank"
+								role="button"
+								color="default"
 								onClick={() => handleRefresh()}
 							>
-								Refresh
+								<Icon>refresh</Icon>
+								<span className="mx-4 hidden sm:flex">Refresh</span>
 							</Button>
 						</FuseAnimate>
 					</div>

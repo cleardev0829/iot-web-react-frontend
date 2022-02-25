@@ -17,19 +17,19 @@ import { useParams } from 'react-router-dom';
 import { selectServicers, sendMessage } from '../../store/servicersSlice';
 import { showMessage } from 'app/store/fuse/messageSlice';
 
-function MessageDialog() {
+function MessageDialog(props) {
 	const dispatch = useDispatch();
 	const routeParams = useParams([]);
 	const servicers = useSelector(selectServicers);
+	const product = useSelector(({ productApp }) => productApp.product);
 
 	const [openDialog, setOpenDialog] = useState(false);
 	const { form, handleChange } = useForm({
-		from: 'johndoe@creapond.com',
 		email: '',
 		phone: '',
 		subject: '',
 		message: ''
-	});
+	});	
 
 	function handleOpenDialog() {
 		setOpenDialog(true);
@@ -53,7 +53,11 @@ function MessageDialog() {
 		promises.push(
 			new Promise((resolve, reject) =>
 				_servicers.map(async servicer => {
-					await dispatch(sendMessage({ ...form, email: servicer.email, phone: servicer.phone }))
+					await dispatch(sendMessage({ 
+						...form, message: `An error was reported from the ${product.uid} - ${product.name} - ${product.location.address}. \n ${form.subject}`, 
+						email: servicer.email, 
+						phone: servicer.phone 
+					}))
 						.then(response => resolve(response))
 						.catch(error => resolve(error));
 				})
