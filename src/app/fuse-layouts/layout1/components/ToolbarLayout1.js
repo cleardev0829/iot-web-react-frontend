@@ -53,7 +53,7 @@ function ToolbarLayout1(props) {
               <IconButton
                 className={clsx("w-40 h-40", props.className)}
                 component="a"
-                href="https://rocket-tableau-design.netlify.app"
+                href="https://iot-tableau-editor.netlify.app/"
                 target="_blank"
               >
                 <Icon>{"add_to_home_screen"}</Icon>
