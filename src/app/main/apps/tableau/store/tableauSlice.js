@@ -33,6 +33,13 @@ export const deleteBlobInContainer = createAsyncThunk(
       "/api/tableau-app/deleteBlobInContainer",
       { containerName, fileName }
     );
+
+    if (containerName === "tableau-templates") {
+      await axios.post("/api/tableau-app/deleteBlobInContainer", {
+        containerName,
+        fileName: `${fileName.replace(/\.[^/.]+$/, "")}.json`,
+      });
+    }
     const data = await response.data;
 
     dispatch(getBlobsInContainer({ name: containerName }));
