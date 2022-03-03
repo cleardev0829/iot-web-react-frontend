@@ -8,6 +8,8 @@ import _ from "lodash";
 import path from "path";
 import uploadFileToBlob from "app/utils/azure-storage-blob";
 
+const prefix = "tableaus";
+
 export const getBlobsInContainer = createAsyncThunk(
   "tableauApp/folders/getBlobsInContainer",
   async (folder) => {
@@ -72,8 +74,7 @@ export const listContainersInStorage = createAsyncThunk(
     const _data = _.filter(
       data,
       (item) =>
-        item.name.split("-")[0] === "tableau" &&
-        item.name !== "tableau-templates"
+        item.name.split("-")[0] === prefix && item.name !== "tableau-templates"
     );
 
     return _data;
@@ -141,7 +142,7 @@ const foldersSlice = createSlice({
   initialState: foldersAdapter.getInitialState({
     selected: null,
     resource: [],
-    prefix: "tableau",
+    prefix: prefix,
     FolderDialog: {
       type: "new",
       props: {
