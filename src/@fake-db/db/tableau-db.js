@@ -205,7 +205,7 @@ mock.onPost("/api/tableau-app/deleteContainerInStorage").reply((request) => {
 mock.onPost("/api/tableau-app/listContainersInStorage").reply((request) => {
   return new Promise((resolve, reject) => {
     axios
-      .post(`${API_URL}/azure/listContainersInStorage `, {})
+      .post(`${API_URL}/azure/listContainersInStorage`, {})
       .then((response) => {
         const data = response.data;
         resolve([200, data]);

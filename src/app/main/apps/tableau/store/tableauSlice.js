@@ -8,7 +8,7 @@ import _ from "lodash";
 import path from "path";
 import uploadFileToBlob from "app/utils/azure-storage-blob";
 
-const prefix = "tableaus";
+const prefix = "tableau";
 
 export const getBlobsInContainer = createAsyncThunk(
   "tableauApp/folders/getBlobsInContainer",

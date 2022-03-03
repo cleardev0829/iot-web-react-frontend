@@ -57,11 +57,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Resource(props) {
+function Tableau(props) {
   const dispatch = useDispatch();
   const resource = useSelector(({ tableauApp }) => tableauApp.folders.resource);
   const selected = useSelector(({ tableauApp }) => tableauApp.folders.selected);
-  const prefix = useSelector(({ tableauApp }) => tableauApp.folders.prefix);
 
   const classes = useStyles(props);
   const { form, setForm } = useForm(null);
@@ -187,4 +186,4 @@ function Resource(props) {
   );
 }
 
-export default withReducer("tableauApp", reducer)(Resource);
+export default withReducer("tableauApp", reducer)(Tableau);
