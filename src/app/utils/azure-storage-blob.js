@@ -11,16 +11,13 @@ const sasToken =
 
 const storageAccountName =
   process.env.storageresourcename || "rocketiotparserstorage"; // Fill string with your Storage resource name
-// </snippet_package>
 
-// <snippet_isStorageConfigured>
 // Feature flag - disable storage feature to app if not configured
 export const isStorageConfigured = () => {
   return !storageAccountName || !sasToken ? false : true;
 };
 // </snippet_isStorageConfigured>
 
-// <snippet_getBlobsInContainer>
 // return list of blobs in container to display
 export const getBlobsInContainer = async (containerName) => {
   console.log("getBlobsInContainer params", containerName);
@@ -60,21 +57,18 @@ export const getBlobsInContainer = async (containerName) => {
     });
   }
 
-  // for (var i = 0; i < 20; i++) {
-  //   blobList.push({
-  //     id: i,
-  //     name: `name${i}`,
-  //     blobUrl: "https://www.w3schools.com/tags/img_girl.jpg",
-  //     url: "https://www.w3schools.com/tags/img_girl.jpg",
-  //   });
-  // }
-
   return blobList;
 };
 
 export const getBlobsInContainer1 = async (containerName) => {
+  console.log("getBlobInContainer1:", containerName);
   const blobList = [];
-  for (var i = 0; i < 20; i++) {
+  let count = 0;
+  if (containerName === "tableau-mt42") count = 5;
+  else if (containerName === "tableau-rt42") count = 10;
+  else if (containerName === "tableau-displays") count = 15;
+
+  for (var i = 0; i < count; i++) {
     blobList.push({
       id: i,
       name: `name${i}`,
@@ -83,15 +77,6 @@ export const getBlobsInContainer1 = async (containerName) => {
       url:
         "https://res.cloudinary.com/hcti/image/fetch/c_limit,f_auto,q_auto:good,w_800/https://docs.htmlcsstoimage.com/assets/images/cat.png",
     });
-    containerName === "tableau-templates" &&
-      blobList.push({
-        id: i,
-        name: `name${i}`,
-        blobUrl:
-          "https://res.cloudinary.com/hcti/image/fetch/c_limit,f_auto,q_auto:good,w_800/https://docs.htmlcsstoimage.com/assets/images/cat.json",
-        url:
-          "https://res.cloudinary.com/hcti/image/fetch/c_limit,f_auto,q_auto:good,w_800/https://docs.htmlcsstoimage.com/assets/images/cat.json",
-      });
   }
 
   return blobList;
@@ -109,17 +94,6 @@ export const deleteBlobInContainer = async (containerName, fileName) => {
   const blobDeleteResponse = await blockBlobClient.delete();
 
   return blobDeleteResponse;
-
-  // const blobList = []
-  // for (var i = 0; i < 10; i++) {
-  //   blobList.push({
-  //     id: i,
-  //     name: `name${i}`,
-  //     blobUrl: "https://www.w3schools.com/tags/img_girl.jpg",
-  //     url: "https://www.w3schools.com/tags/img_girl.jpg",
-  //   });
-  // }
-  // return blobList
 };
 
 export const downloadBlobFromContainer = async (containerName, file) => {
@@ -145,7 +119,6 @@ export const downloadBlobFromContainer = async (containerName, file) => {
   return blobDownloadResponse;
 };
 
-// <snippet_createBlobInContainer>
 const createBlobInContainer = async (
   containerClient: ContainerClient,
   file: File
@@ -160,10 +133,7 @@ const createBlobInContainer = async (
   await blobClient.uploadBrowserData(file, options);
 };
 
-const uploadFileToBlob = async (
-  containerName,
-  file: File | null
-): Promise<string[]> => {
+const uploadFileToBlob = async (containerName, file): Promise<string[]> => {
   console.log("uploadFileToBlob params", containerName, file);
   if (!file) return [];
 
@@ -172,7 +142,6 @@ const uploadFileToBlob = async (
     `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
   );
 
-  // get Container - full public read access
   const containerClient: ContainerClient = blobService.getContainerClient(
     containerName
   );
@@ -185,6 +154,26 @@ const uploadFileToBlob = async (
 
   const blobUrl = `https://${storageAccountName}.blob.core.windows.net/${containerName}/${file.name}`;
   return blobUrl;
+};
+
+export const deleteContainer = async (containerName) => {
+  console.log("=============================deleteContainer", containerName);
+  if (!containerName) return [];
+
+  // get BlobService = notice `?` is pulled out of sasToken - if created in Azure portal
+  const blobService = new BlobServiceClient(
+    `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
+  );
+
+  // get Container - full public read access
+  const containerClient: ContainerClient = blobService.getContainerClient(
+    containerName
+  );
+  const data = await containerClient.deleteIfExists({
+    access: "container",
+  });
+
+  return data;
 };
 
 export default uploadFileToBlob;

@@ -1,12 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import resource from "./resourcesSlice";
-// import templates from './templatesSlice';
 import dialog from "./dialogSlice";
+import folders from "./tableauSlice";
 
 const reducer = combineReducers({
-  resource,
-  //   templates,
   dialog,
+  folders,
 });
 
 export default reducer;

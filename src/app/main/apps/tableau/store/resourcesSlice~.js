@@ -2,17 +2,29 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import FuseUtils from "@fuse/utils";
 import uploadFileToBlob, {
   deleteBlobInContainer,
-  getBlobsInContainer,
-  getBlobsInContainer1,
 } from "app/utils/azure-storage-blob";
 import _ from "lodash";
 import path from "path";
+import axios from "axios";
+
+export const getFolders = createAsyncThunk(
+  "tableauApp/resource/getFolders",
+  async () => {
+    const response = await axios.get("/api/tableau-app/folders", {});
+    const data = await response.data;
+
+    return data;
+  }
+);
 
 export const getBlobFiles = createAsyncThunk(
-  "tableauApp/resource/getBlobFiles",
+  "tableauApp/resource/getBlobsInContainer",
   async (params) => {
     const { containerName } = params;
-    const data = await getBlobsInContainer(containerName);
+    const response = await axios.post("/api/tableau-app/getBlobsInContainer", {
+      containerName,
+    });
+    const data = await response.data;
 
     const _data = _.filter(
       data,
@@ -44,7 +56,7 @@ export const deleteFile = createAsyncThunk(
 );
 
 export const uploadFile = createAsyncThunk(
-  "tableauApp/resource/uploadFile",
+  "tableauApp/resource/uploadBlobInContainer",
   async (params, { dispatch, getState }) => {
     const { containerName, file } = params;
     await uploadFileToBlob(containerName, file);
@@ -53,11 +65,16 @@ export const uploadFile = createAsyncThunk(
   }
 );
 
+// export const {
+//   selectAll: selectFolders,
+//   selectById: selectFoldersById,
+// } = foldersAdapter.getSelectors((state) => state.tableauApp.folders);
+
 const resourceSlice = createSlice({
   name: "tableauApp/resource",
-  initialState: null,
+  initialState: [],
   reducers: {
-    resetResource: () => null,
+    resetResource: () => [],
   },
   extraReducers: {
     [getBlobFiles.fulfilled]: (state, action) => action.payload,

@@ -5,6 +5,7 @@ import "./db/users-db";
 import "./db/servicers-db";
 import "./db/file-manager-db";
 import "./db/notes-db";
+import "./db/tableau-db";
 import mock from "./mock";
 
 mock.onAny().passThrough();

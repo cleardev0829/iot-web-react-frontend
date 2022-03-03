@@ -1,4 +1,3 @@
-import FuseAnimate from "@fuse/core/FuseAnimate";
 import FuseLoading from "@fuse/core/FuseLoading";
 import FusePageCarded from "@fuse/core/FusePageCarded";
 import { useForm, useDeepCompareEffect } from "@fuse/hooks";
@@ -6,22 +5,22 @@ import FuseUtils from "@fuse/utils";
 import { grey } from "@material-ui/core/colors";
 import Icon from "@material-ui/core/Icon";
 import { makeStyles } from "@material-ui/core/styles";
-import Tab from "@material-ui/core/Tab";
-import Tabs from "@material-ui/core/Tabs";
-import Typography from "@material-ui/core/Typography";
 import withReducer from "app/store/withReducer";
 import clsx from "clsx";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getBlobsInContainer,
+  deleteBlobInContainer,
+  uploadBlobInContainer,
   resetResource,
-  deleteFile,
-  uploadFile,
-  getBlobFiles,
-} from "./store/resourcesSlice";
+} from "./store/tableauSlice";
 import { openImageDialog } from "./store/dialogSlice";
 import reducer from "./store";
 import ImageDialog from "./ImageDialog";
+import FolderDialog from "./FolderDialog";
+import TableauSidebarContent from "./TableauSidebarContent";
+import TableauSidebarHeader from "./TableauSidebarHeader";
 
 const useStyles = makeStyles((theme) => ({
   resourceImageFeaturedStar: {
@@ -58,38 +57,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CONTAINERS = [
-  "mt42",
-  "rt42",
-  "displays",
-  "engravings",
-  "others",
-  "templates",
-];
-
 function Resource(props) {
   const dispatch = useDispatch();
-  const resource = useSelector(({ tableauApp }) => tableauApp.resource);
+  const resource = useSelector(({ tableauApp }) => tableauApp.folders.resource);
+  const selected = useSelector(({ tableauApp }) => tableauApp.folders.selected);
+  const prefix = useSelector(({ tableauApp }) => tableauApp.folders.prefix);
 
   const classes = useStyles(props);
-  const [tabValue, setTabValue] = useState(0);
-
   const { form, setForm } = useForm(null);
 
   useDeepCompareEffect(() => {
     function updateResourceState() {
-      dispatch(
-        getBlobFiles({ containerName: `tableau-${CONTAINERS[tabValue]}` })
-      );
+      dispatch(getBlobsInContainer({ ...form, name: selected }));
     }
 
     updateResourceState();
-  }, [dispatch, tabValue]);
+  }, [dispatch, selected]);
 
   useEffect(() => {
-    if ((resource && !form) || (resource && form && resource.id !== form.id)) {
-      setForm(resource);
-    }
+    setForm(resource);
   }, [form, resource, setForm]);
 
   useEffect(() => {
@@ -97,10 +83,6 @@ function Resource(props) {
       dispatch(resetResource());
     };
   }, [dispatch]);
-
-  function handleChangeTab(event, value) {
-    setTabValue(value);
-  }
 
   function handleUploadChange(e) {
     const file = e.target.files[0];
@@ -115,8 +97,8 @@ function Resource(props) {
     });
 
     dispatch(
-      uploadFile({
-        containerName: `tableau-${CONTAINERS[tabValue]}`,
+      uploadBlobInContainer({
+        containerName: selected,
         file: newFile,
       })
     );
@@ -133,70 +115,11 @@ function Resource(props) {
           toolbar: "p-0",
           header: "min-h-72 h-72 sm:h-136 sm:min-h-136",
         }}
-        header={
-          form && (
-            <div className="flex flex-1 w-full items-center justify-between">
-              <div className="flex flex-col items-start max-w-full">
-                <div className="flex items-center max-w-full">
-                  <FuseAnimate animation="transition.expandIn" delay={300}>
-                    <Icon className="text-32">elevator</Icon>
-                  </FuseAnimate>
-                  <div className="flex flex-col min-w-0 mx-8 sm:mc-16">
-                    <FuseAnimate animation="transition.slideLeftIn" delay={300}>
-                      <Typography className="text-16 sm:text-20 truncate">
-                        Tableau
-                      </Typography>
-                    </FuseAnimate>
-                  </div>
-                </div>
-              </div>
-              {/* <div>
-              <FuseAnimate animation="transition.slideRightIn" delay={300}>
-                <Button
-                  className="whitespace-nowrap mx-4"
-                  variant="contained"
-                  color="secondary"
-                  disabled={!selected}
-                  onClick={() =>
-                    dispatch(
-                      deleteFile({
-                        ...selected,
-                        containerName: `tableau-${CONTAINERS[tabValue]}`,
-                      })
-                    )
-                  }
-                  startIcon={<Icon className="hidden sm:flex">delete</Icon>}
-                >
-                  Remove
-                </Button>
-              </FuseAnimate>             
-            </div> */}
-            </div>
-          )
-        }
-        contentToolbar={
-          <Tabs
-            value={tabValue}
-            onChange={handleChangeTab}
-            indicatorColor="primary"
-            textColor="primary"
-            variant="scrollable"
-            scrollButtons="auto"
-            classes={{ root: "w-full h-64" }}
-          >
-            <Tab className="h-64 normal-case" label="mt42" />
-            <Tab className="h-64 normal-case" label="rt42" />
-            <Tab className="h-64 normal-case" label="displays" />
-            <Tab className="h-64 normal-case" label="engravings" />
-            <Tab className="h-64 normal-case" label="others" />
-            <Tab className="h-64 normal-case" label="templates" />
-          </Tabs>
-        }
         content={
           <div className="p-16 sm:p-24 max-w-2xl">
             <div>
               <div className="flex justify-center sm:justify-start flex-wrap -mx-8">
-                {tabValue < 5 && (
+                {selected && selected !== "tableau-templates" && (
                   <label
                     htmlFor="button-file"
                     className={clsx(
@@ -205,7 +128,7 @@ function Resource(props) {
                     )}
                   >
                     <input
-                      accept="image/*"
+                      accept=".png"
                       className="hidden"
                       id="button-file"
                       type="file"
@@ -216,14 +139,10 @@ function Resource(props) {
                     </Icon>
                   </label>
                 )}
+
                 {form &&
-                  form.images.map((media) => (
+                  form.map((media) => (
                     <div
-                      // onClick={() => {
-                      //   setSelected(media);
-                      //   setFeaturedImage(media.id);
-                      // }}
-                      // onKeyDown={() => setFeaturedImage(media.id)}
                       role="button"
                       tabIndex={0}
                       className={clsx(
@@ -236,8 +155,8 @@ function Resource(props) {
                       <Icon
                         onClick={() => {
                           dispatch(
-                            deleteFile({
-                              containerName: `tableau-${CONTAINERS[tabValue]}`,
+                            deleteBlobInContainer({
+                              containerName: selected,
                               fileName: media.name,
                             })
                           );
@@ -258,9 +177,12 @@ function Resource(props) {
             </div>
           </div>
         }
+        leftSidebarHeader={<TableauSidebarHeader />}
+        leftSidebarContent={<TableauSidebarContent />}
         innerScroll
       />
       <ImageDialog />
+      <FolderDialog />
     </>
   );
 }
