@@ -132,7 +132,7 @@ function FolderDialog(props) {
                 const response = await dispatch(
                   isExistsContainerInStorage({
                     ...form,
-                    name: `tableau-${form.name}`,
+                    name: `${prefix}-${form.name}`,
                   })
                 );
                 const isExistsContainer = await response.payload;
