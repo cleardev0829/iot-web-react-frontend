@@ -16,7 +16,6 @@ import {
   selectFolders,
   setSelected,
   openNewFolderDialog,
-  openEditFolderDialog,
 } from "./store/tableauSlice";
 
 const useStyles = makeStyles((theme) => ({
@@ -63,7 +62,7 @@ function TableauSidebarContent(props) {
     if (folders.length > 0 && !selected) {
       dispatch(setSelected(folders[0].name));
     }
-  }, [folders]);
+  }, [dispatch, folders, selected]);
 
   return (
     <FuseAnimate animation="transition.slideUpIn" delay={400}>

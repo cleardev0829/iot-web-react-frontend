@@ -2,7 +2,7 @@ import FuseAnimate from "@fuse/core/FuseAnimate";
 import Icon from "@material-ui/core/Icon";
 import Typography from "@material-ui/core/Typography";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 function TableauSidebarHeader() {
   const selected = useSelector(({ tableauApp }) => tableauApp.folders.selected);
